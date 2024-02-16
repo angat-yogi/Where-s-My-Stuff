@@ -27,9 +27,9 @@ export default function Header() {
             <View>
               <Text
                 style={{
-                  fontSize: 10,
-                  color: Colors.WHITE,
-                  fontWeight: "bold",
+                  fontSize: 13,
+                  color: "purple",
+                  fontFamily: "protestRiot",
                 }}
               >
                 Hello,{" "}
@@ -38,7 +38,7 @@ export default function Header() {
                 style={{
                   fontSize: 15,
                   color: Colors.BLACK,
-                  fontWeight: "bold",
+                  fontFamily: "outfit-bold",
                 }}
               >
                 {user?.firstName}!
@@ -100,6 +100,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     width: "85%",
     fontSize: 16,
+    fontFamily: "protestRiot",
   },
   searchContainer: {
     marginTop: 15,
