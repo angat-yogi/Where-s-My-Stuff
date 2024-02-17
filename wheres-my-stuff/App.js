@@ -6,6 +6,7 @@ import * as SecureStore from "expo-secure-store";
 import TabNavigator from "./App/Navigations/TabNavigator";
 import { NavigationContainer } from "@react-navigation/native";
 import { useFonts } from "expo-font";
+import ProfileNavigator from "./App/Navigations/ProfileNavigator";
 export default function App() {
   EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY =
     "pk_test_Zmxvd2luZy1zaGVwaGVyZC02OS5jbGVyay5hY2NvdW50cy5kZXYk";
@@ -13,7 +14,7 @@ export default function App() {
     outfit: require("./assets/fonts/Outfit-Regular.ttf"),
     "outfit-medium": require("./assets/fonts/Outfit-Medium.ttf"),
     "outfit-bold": require("./assets/fonts/Outfit-Bold.ttf"),
-    protestRiot: require("./assets/fonts/ProtestRiot-Regular.ttf"),
+    // ProtestRiot: require("./assets/fonts/ProtestRiot-Regular.ttf"),
   });
 
   const tokenCache = {
@@ -40,7 +41,8 @@ export default function App() {
       <View style={styles.container}>
         <SignedIn>
           <NavigationContainer>
-            <TabNavigator />
+            {/* <TabNavigator /> */}
+            <ProfileNavigator />
           </NavigationContainer>
         </SignedIn>
         <SignedOut>

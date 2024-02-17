@@ -8,11 +8,21 @@ import { SimpleLineIcons } from "@expo/vector-icons";
 import ToDoScreen from "../Screens/ToDoScreen/ToDoScreen";
 import { AntDesign } from "@expo/vector-icons";
 import Colors from "../Utils/Colors";
+import { MaterialIcons } from "@expo/vector-icons";
+import FavoriteScreen from "../Screens/Favorite/FavoriteScreen";
 
+const tabType = {
+  HomeScreen,
+  ProfileScreen,
+  ToDoScreen,
+  FavoriteScreen,
+};
 const Tab = createBottomTabNavigator();
+
 const TabNavigator = () => {
   return (
     <Tab.Navigator
+      tabBarHideOnKeyboard="true"
       screenOptions={{
         headerShown: false,
         tabBarActiveTintColor: Colors.PRIMARY,
@@ -40,7 +50,7 @@ const TabNavigator = () => {
           ),
         }}
       />
-      <Tab.Screen
+      {/* <Tab.Screen
         name="Profile"
         component={ProfileScreen}
         options={{
@@ -50,6 +60,15 @@ const TabNavigator = () => {
               size={size}
               color={color}
             />
+          ),
+        }}
+      /> */}
+      <Tab.Screen
+        name="Favorite"
+        component={FavoriteScreen}
+        options={{
+          tabBarIcon: ({ color, size }) => (
+            <MaterialIcons name="favorite" size={size} color={color} />
           ),
         }}
       />

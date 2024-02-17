@@ -11,14 +11,20 @@ import { useUser } from "@clerk/clerk-expo";
 import Colors from "../../Utils/Colors";
 import { MaterialIcons } from "@expo/vector-icons";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { useNavigation } from "@react-navigation/native";
+
 export default function Header() {
   const { user, isLoading } = useUser();
+  const navigation = useNavigation();
+  const handleProfilePress = () => {
+    navigation.openDrawer();
+  };
   return (
     user && (
       <View style={styles.container}>
         <View style={styles.addContainer}>
           <View style={styles.profileContainer}>
-            <TouchableOpacity>
+            <TouchableOpacity onPress={handleProfilePress}>
               <Image
                 source={{ uri: user?.imageUrl }}
                 style={styles.userImage}
@@ -29,7 +35,7 @@ export default function Header() {
                 style={{
                   fontSize: 13,
                   color: "purple",
-                  fontFamily: "protestRiot",
+                  fontFamily: "outfit",
                 }}
               >
                 Hello,{" "}
@@ -57,7 +63,7 @@ export default function Header() {
               style={styles.searchButton}
               name="archive-search"
               size={24}
-              color={Colors.PRIMARY}
+              color={Colors.WHITE}
             />
           </TouchableOpacity>
         </View>
@@ -100,7 +106,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     width: "85%",
     fontSize: 16,
-    fontFamily: "protestRiot",
+    fontFamily: "outfit",
   },
   searchContainer: {
     marginTop: 15,
@@ -109,7 +115,7 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   searchButton: {
-    backgroundColor: Colors.WHITE,
+    backgroundColor: Colors.BEIGE,
     padding: 10,
     borderRadius: 10,
   },
