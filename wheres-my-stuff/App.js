@@ -14,9 +14,8 @@ export default function App() {
     outfit: require("./assets/fonts/Outfit-Regular.ttf"),
     "outfit-medium": require("./assets/fonts/Outfit-Medium.ttf"),
     "outfit-bold": require("./assets/fonts/Outfit-Bold.ttf"),
-    // ProtestRiot: require("./assets/fonts/ProtestRiot-Regular.ttf"),
+    ProtestRiot: require("./assets/fonts/ProtestRiot-Regular.ttf"),
   });
-
   const tokenCache = {
     async getToken(key) {
       try {
