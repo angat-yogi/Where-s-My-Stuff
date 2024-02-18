@@ -20,6 +20,28 @@ const getCategories = async () => {
       }
     }
   `;
+
+  try {
+    result = await graphQLClient.request(query);
+  } catch (error) {
+    console.log("error on api:", error);
+  }
+  return result;
+};
+const getTrendingFashions = async () => {
+  let result;
+  const query = gql`
+    query GetTrendingFashions {
+      trendingFashions {
+        id
+        name
+        noOfClicks
+        image {
+          url
+        }
+      }
+    }
+  `;
   try {
     result = await graphQLClient.request(query);
   } catch (error) {
@@ -30,4 +52,5 @@ const getCategories = async () => {
 
 export default {
   getCategories,
+  getTrendingFashions,
 };

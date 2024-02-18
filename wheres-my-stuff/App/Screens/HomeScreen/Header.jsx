@@ -19,6 +19,7 @@ export default function Header() {
   const handleProfilePress = () => {
     navigation.openDrawer();
   };
+
   return (
     user && (
       <View style={styles.container}>
