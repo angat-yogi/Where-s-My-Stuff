@@ -1,4 +1,4 @@
-import { View, Text, ActivityIndicator } from "react-native";
+import { View, Text, ActivityIndicator, StyleSheet } from "react-native";
 import React, { useEffect } from "react";
 import {
   useCameraPermission,
@@ -9,6 +9,7 @@ import {
 export default function CameraComponent() {
   const device = useCameraDevice("back");
   if (device == null) return <Text>No device found</Text>;
+
   const { hasPermission, requestPermission } = useCameraPermission();
 
   console.log("Camera Component: ", hasPermission);
@@ -21,8 +22,8 @@ export default function CameraComponent() {
     return <ActivityIndicator />;
   }
   return (
-    <View>
-      <Camera device={device} isActive={true} />
+    <View style={{ flex: 1 }}>
+      <Camera style={StyleSheet.absoluteFill} device={device} isActive={true} />
     </View>
   );
 }
