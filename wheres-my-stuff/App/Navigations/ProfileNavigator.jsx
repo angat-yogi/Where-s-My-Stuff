@@ -17,11 +17,6 @@ export default function ProfileNavigator() {
         options={{ drawerLabel: () => null }}
         component={TabNavigator}
       />
-      <Drawer.Screen
-        name="Camera"
-        component={CameraComponent}
-        options={{ drawerLabel: "Camera" }}
-      />
     </Drawer.Navigator>
   );
 }

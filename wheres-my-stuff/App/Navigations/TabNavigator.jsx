@@ -10,6 +10,7 @@ import { AntDesign } from "@expo/vector-icons";
 import Colors from "../Utils/Colors";
 import { MaterialIcons } from "@expo/vector-icons";
 import FavoriteScreen from "../Screens/Favorite/FavoriteScreen";
+import HomeNavigator from "./HomeNavigator";
 
 const Tab = createBottomTabNavigator();
 
@@ -24,7 +25,7 @@ const TabNavigator = () => {
     >
       <Tab.Screen
         name="Home"
-        component={HomeScreen}
+        component={HomeNavigator}
         options={{
           tabBarIcon: ({ color, size }) => (
             <MaterialCommunityIcons
@@ -44,19 +45,6 @@ const TabNavigator = () => {
           ),
         }}
       />
-      {/* <Tab.Screen
-        name="Profile"
-        component={ProfileScreen}
-        options={{
-          tabBarIcon: ({ color, size }) => (
-            <MaterialCommunityIcons
-              name="gender-male-female-variant"
-              size={size}
-              color={color}
-            />
-          ),
-        }}
-      /> */}
       <Tab.Screen
         name="Favorite"
         component={FavoriteScreen}

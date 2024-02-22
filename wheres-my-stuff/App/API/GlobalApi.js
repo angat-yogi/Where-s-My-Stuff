@@ -49,8 +49,29 @@ const getTrendingFashions = async () => {
   }
   return result;
 };
+const getStorageTypes = async () => {
+  let result;
+  const query = gql`
+    query GetStorageTypes {
+      storageTypes {
+        storageTypeName
+        id
+        image {
+          url
+        }
+      }
+    }
+  `;
+  try {
+    result = await graphQLClient.request(query);
+  } catch (error) {
+    console.log("error on api:", error);
+  }
+  return result;
+};
 
 export default {
   getCategories,
   getTrendingFashions,
+  getStorageTypes,
 };

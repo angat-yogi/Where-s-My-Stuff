@@ -6,12 +6,22 @@ import {
   StyleSheet,
   FlatList,
   Image,
+  Pressable,
 } from "react-native";
+import { useNavigation } from "@react-navigation/native";
 import React, { useEffect, useState } from "react";
-import GlobalApi from "../../API/GlobalApi";
 import Heading from "../../Shared/Heading";
 
 export default function Slider({ data, heading, isViewAll, styleImage }) {
+  const navigation = useNavigation();
+  const openAssociatedComponent = (storageName) => {
+    console.log(storageName);
+    if (storageName === "Closet") {
+      navigation.navigate(storageName?.toLowerCase());
+    } else {
+      return;
+    }
+  };
   return (
     <View>
       <View style={styles.categories}>
@@ -21,18 +31,26 @@ export default function Slider({ data, heading, isViewAll, styleImage }) {
           horizontal={true}
           showsHorizontalScrollIndicator={false}
           renderItem={({ item, index }) => (
-            <View style={{ marginRight: 20, alignItems: "center" }}>
-              <Text style={styles.categoryName}>{item.name}</Text>
+            <TouchableOpacity
+              onPress={() =>
+                openAssociatedComponent(item.storageTypeName || null)
+              }
+              style={{ marginRight: 20, alignItems: "center" }}
+            >
+              <Text style={styles.categoryName}>
+                {item.name || item.storageTypeName}
+              </Text>
               <Image
                 style={styleImage}
                 source={{
                   uri:
                     item?.displayImage?.url ||
-                    (item?.image && item.image[0]?.url) ||
+                    item.image[0]?.url ||
+                    item.image.url ||
                     null,
                 }}
               />
-            </View>
+            </TouchableOpacity>
           )}
         />
       </View>
