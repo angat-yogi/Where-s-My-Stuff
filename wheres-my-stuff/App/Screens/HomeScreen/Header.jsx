@@ -11,8 +11,9 @@ import { useUser } from "@clerk/clerk-expo";
 import Colors from "../../Utils/Colors";
 import { MaterialIcons } from "@expo/vector-icons";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { FontAwesome } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
-export default function Header() {
+export default function Header({ style, shouldDisplayProfile, icon }) {
   const { user, isLoading } = useUser();
   const navigation = useNavigation();
   const handleProfilePress = () => {
@@ -55,7 +56,7 @@ export default function Header() {
             </View>
           </View>
           <TouchableOpacity onPress={handleCameraPress}>
-            <MaterialIcons name="add-alert" size={29} color="black" />
+            <FontAwesome name={icon} size={24} color="black" />
           </TouchableOpacity>
         </View>
         {/* Search Section */}
