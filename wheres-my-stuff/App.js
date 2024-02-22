@@ -6,6 +6,8 @@ import * as SecureStore from "expo-secure-store";
 import TabNavigator from "./App/Navigations/TabNavigator";
 import { NavigationContainer } from "@react-navigation/native";
 import { useFonts } from "expo-font";
+import { SafeAreaProvider } from "react-native-safe-area-context";
+
 import ProfileNavigator from "./App/Navigations/ProfileNavigator";
 export default function App() {
   EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY =
@@ -33,23 +35,24 @@ export default function App() {
     },
   };
   return (
-    <ClerkProvider
-      tokenCache={tokenCache}
-      publishableKey={EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY}
-    >
-      <View style={styles.container}>
-        <SignedIn>
-          <NavigationContainer>
-            {/* <TabNavigator /> */}
-            <ProfileNavigator />
-          </NavigationContainer>
-        </SignedIn>
-        <SignedOut>
-          <Login />
-        </SignedOut>
-        <StatusBar style="auto" />
-      </View>
-    </ClerkProvider>
+    <SafeAreaProvider>
+      <ClerkProvider
+        tokenCache={tokenCache}
+        publishableKey={EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY}
+      >
+        <View style={styles.container}>
+          <SignedIn>
+            <NavigationContainer>
+              <ProfileNavigator />
+            </NavigationContainer>
+          </SignedIn>
+          <SignedOut>
+            <Login />
+          </SignedOut>
+          <StatusBar style="auto" />
+        </View>
+      </ClerkProvider>
+    </SafeAreaProvider>
   );
 }
 

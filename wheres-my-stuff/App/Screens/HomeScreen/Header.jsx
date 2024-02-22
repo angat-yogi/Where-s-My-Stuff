@@ -12,12 +12,14 @@ import Colors from "../../Utils/Colors";
 import { MaterialIcons } from "@expo/vector-icons";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
-
 export default function Header() {
   const { user, isLoading } = useUser();
   const navigation = useNavigation();
   const handleProfilePress = () => {
     navigation.openDrawer();
+  };
+  const handleCameraPress = () => {
+    navigation.navigate("Camera"); //it is not working so can I use
   };
 
   return (
@@ -52,7 +54,7 @@ export default function Header() {
               </Text>
             </View>
           </View>
-          <TouchableOpacity>
+          <TouchableOpacity onPress={handleCameraPress}>
             <MaterialIcons name="add-alert" size={29} color="black" />
           </TouchableOpacity>
         </View>

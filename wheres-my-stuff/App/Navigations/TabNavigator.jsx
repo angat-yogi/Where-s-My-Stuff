@@ -11,12 +11,6 @@ import Colors from "../Utils/Colors";
 import { MaterialIcons } from "@expo/vector-icons";
 import FavoriteScreen from "../Screens/Favorite/FavoriteScreen";
 
-const tabType = {
-  HomeScreen,
-  ProfileScreen,
-  ToDoScreen,
-  FavoriteScreen,
-};
 const Tab = createBottomTabNavigator();
 
 const TabNavigator = () => {
