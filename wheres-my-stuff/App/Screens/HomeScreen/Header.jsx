@@ -13,14 +13,14 @@ import { MaterialIcons } from "@expo/vector-icons";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { FontAwesome } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
-export default function Header({ style, shouldDisplayProfile, icon }) {
+export default function Header({ style, shouldDisplayProfile, icon, action }) {
   const { user, isLoading } = useUser();
   const navigation = useNavigation();
   const handleProfilePress = () => {
     navigation.openDrawer();
   };
-  const handleCameraPress = () => {
-    navigation.navigate("Camera"); //it is not working so can I use
+  const handlePress = (action) => {
+    navigation.navigate(action); //it is not working so can I use
   };
 
   return (
@@ -55,7 +55,7 @@ export default function Header({ style, shouldDisplayProfile, icon }) {
               </Text>
             </View>
           </View>
-          <TouchableOpacity onPress={handleCameraPress}>
+          <TouchableOpacity onPress={() => handlePress(action)}>
             <FontAwesome name={icon} size={24} color="black" />
           </TouchableOpacity>
         </View>

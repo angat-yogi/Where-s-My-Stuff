@@ -11,6 +11,7 @@ import Colors from "../Utils/Colors";
 import { MaterialIcons } from "@expo/vector-icons";
 import FavoriteScreen from "../Screens/Favorite/FavoriteScreen";
 import HomeNavigator from "./HomeNavigator";
+import ToDoScreenNavigator from "./ToDoScreenNavigator";
 
 const Tab = createBottomTabNavigator();
 
@@ -38,7 +39,7 @@ const TabNavigator = () => {
       />
       <Tab.Screen
         name="To Do"
-        component={ToDoScreen}
+        component={ToDoScreenNavigator}
         options={{
           tabBarIcon: ({ color, size }) => (
             <AntDesign name="tool" size={size} color={color} />

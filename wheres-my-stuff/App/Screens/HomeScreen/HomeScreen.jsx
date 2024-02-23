@@ -32,7 +32,7 @@ export default function HomeScreen() {
   }, []);
   return (
     <ScrollView contentContainerStyle={styles.scrollViewContent}>
-      <Header icon="camera" />
+      <Header icon="camera" action="Camera" />
       <View style={{ padding: 20 }}>
         <Slider
           isViewAll={true}

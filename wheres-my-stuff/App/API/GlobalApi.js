@@ -28,6 +28,38 @@ const getCategories = async () => {
   }
   return result;
 };
+const addToDos = async (data) => {
+  let result;
+  const isoDueDate = new Date(data.dueDate).toISOString();
+
+  const mutationQuery = gql`
+    mutation createToDo {
+      createToDo(
+        data: { 
+          userId: "${data.userId}", 
+          description: "${data.description}", 
+          dueDate: "${isoDueDate}", 
+          category: Upcoming 
+        }
+      ){
+        id
+        description
+        dueDate
+        category
+      }
+      publishManyToDos {
+        count
+      }
+    }
+  `;
+
+  try {
+    result = await request(URL, mutationQuery);
+  } catch (error) {
+    console.log("error on api:", error);
+  }
+  return result;
+};
 const getTrendingFashions = async () => {
   let result;
   const query = gql`
@@ -74,4 +106,5 @@ export default {
   getCategories,
   getTrendingFashions,
   getStorageTypes,
+  addToDos,
 };

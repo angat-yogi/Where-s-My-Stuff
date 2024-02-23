@@ -21,6 +21,7 @@ const { width } = Dimensions.get("screen");
 export default function ProfileScreen(props) {
   const navigation = useNavigation();
   const { user, isLoading } = useUser();
+  console.log(user);
   const { isLoaded, signOut } = useAuth();
   if (!isLoaded) {
     return null;

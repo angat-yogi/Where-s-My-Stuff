@@ -84,7 +84,7 @@ export default function ToDoScreen() {
 
   return (
     <View style={styles.container}>
-      <Header icon="plus" />
+      <Header icon="plus" action="addToDo" />
       <View style={styles.sliderContainer}>
         <Slider />
       </View>
