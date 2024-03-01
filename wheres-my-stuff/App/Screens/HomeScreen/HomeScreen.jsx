@@ -36,18 +36,21 @@ export default function HomeScreen() {
       <View style={{ padding: 20 }}>
         <Slider
           isViewAll={true}
+          displayHeading={true}
           heading="Categories For You"
           data={categories}
           styleImage={styles.imageCategory}
         />
         <Slider
           isViewAll={false}
+          displayHeading={true}
           heading="Trending Fashions"
           data={sortedFashions}
           styleImage={styles.imageFashion}
         />
         <Slider
-          isViewAll={true}
+          // isViewAll={false}
+          plus={true}
           heading="Places To Store"
           data={storageTypes}
           styleImage={styles.imageFashion}

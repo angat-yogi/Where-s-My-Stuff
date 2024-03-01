@@ -8,24 +8,47 @@ import {
   Image,
   Pressable,
 } from "react-native";
+import { FontAwesome } from "@expo/vector-icons";
+
 import { useNavigation } from "@react-navigation/native";
 import React, { useEffect, useState } from "react";
 import Heading from "../../Shared/Heading";
 
-export default function Slider({ data, heading, isViewAll, styleImage }) {
+export default function Slider({ data, heading, isViewAll,plus, styleImage,displayHeading}) {
   const navigation = useNavigation();
-  const openAssociatedComponent = (storageName) => {
-    console.log(storageName);
-    if (storageName === "Closet") {
-      navigation.navigate(storageName?.toLowerCase());
-    } else {
+  const handlePress = (action) => {
+    if(action==='closet'||action==='Camera'){
+      navigation.navigate(action); 
+    }
+    else{
       return;
     }
   };
   return (
     <View>
       <View style={styles.categories}>
-        <Heading text={heading} isViewAll={isViewAll} />
+        {
+          displayHeading&&(  <Heading text={heading} isViewAll={isViewAll} />
+          )
+        }
+        <View style={{
+    display: "flex",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  }}>
+
+{plus && (
+  <>
+  <Heading text={heading} isViewAll={isViewAll} />
+          <TouchableOpacity onPress={() => handlePress("Camera")}>
+            <FontAwesome name="plus" size={24} color="black" />
+          </TouchableOpacity>
+  </>
+            
+        )}
+        </View>
+        
         <FlatList
           data={data}
           horizontal={true}
@@ -33,7 +56,7 @@ export default function Slider({ data, heading, isViewAll, styleImage }) {
           renderItem={({ item, index }) => (
             <TouchableOpacity
               onPress={() =>
-                openAssociatedComponent(item.storageTypeName || null)
+                handlePress(item.storageTypeName?.toLowerCase() || null)
               }
               style={{ marginRight: 20, alignItems: "center" }}
             >

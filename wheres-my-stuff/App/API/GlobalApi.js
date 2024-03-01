@@ -60,6 +60,57 @@ const addToDos = async (data) => {
   }
   return result;
 };
+const encodeImageToBase64 = async (imageUrl) => {
+  const response = await fetch(imageUrl);
+  const blob = await response.blob();
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      resolve(reader.result.split(',')[1]); // Extract Base64-encoded data from Data URL
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(blob);
+  });
+};
+const adduserStorage = async (data) => {
+  let result;
+  const timestamp = new Date().getTime(); // Get current timestamp
+  const randomString = Math.random().toString(36).substring(2, 15); // Generate random string
+  const uniqueHandle = `${timestamp}_${randomString}`;
+  const fileName = data.image.url.substring(data.image.uri.lastIndexOf('/') + 1);
+
+  const mutationQuery = gql`
+  mutation createUserStorage {
+    createUserStorage(
+      data: {
+        userEmail: "${data.userId}",
+        userStorageImage: {
+          create: {
+            fileName: "${fileName}",  
+            handle: "${uniqueHandle}",
+            width:"${data?.width}",
+            height:"${data?.height}"  
+          }
+        }
+      }
+    ) {
+      id
+    }
+    publishManyUserStorages {
+      count
+    }
+  }
+  `;
+  console.log("mutationQuery",mutationQuery)
+try {
+  result = await request(URL, mutationQuery);
+  console.log(result)
+} catch (error) {
+  console.log("error on api:", error);
+}
+return result;
+};
+
 const getTrendingFashions = async () => {
   let result;
   const query = gql`
@@ -107,4 +158,5 @@ export default {
   getTrendingFashions,
   getStorageTypes,
   addToDos,
+  adduserStorage
 };
