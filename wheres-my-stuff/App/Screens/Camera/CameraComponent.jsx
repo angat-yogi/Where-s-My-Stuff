@@ -5,11 +5,13 @@ import GlobalApi from "../../API/GlobalApi";
 import { useUser } from "@clerk/clerk-expo";
 import * as FileSystem from 'expo-file-system';
 import BackgroundAdjustmentScreen from './BackgroundAdjustmentScreen';
+import * as ImagePicker from "expo-image-picker";
 
 export default function CameraComponent() {
   const [type, setType] = useState(CameraType.back);
   const [permission, requestPermission] = Camera.useCameraPermissions();
   const cameraRef = useRef(null);
+  const[image,setImage]=useState();
   const { user, isLoading } = useUser();
 
   if (!permission) {
@@ -28,35 +30,54 @@ export default function CameraComponent() {
   };
   
 let data=null;
-  const takePicture = async () => {
-    if (cameraRef.current) {
-      try {
-        const options = { quality: 0.5, skipProcessing: false };
-        const imagedata = await cameraRef.current.takePictureAsync(options);
-        console.log("imageData: ",imagedata)
+  // const takePicture = async () => {
+  //   if (cameraRef.current) {
+  //     try {
+  //       const options = { quality: 0.5, skipProcessing: false };
+  //       const imagedata = await cameraRef.current.takePictureAsync(options);
+  //       console.log("imageData: ",imagedata)
         
-        const base64Image = await FileSystem.readAsStringAsync(imagedata.uri, { encoding: FileSystem.EncodingType.Base64 });
+  //       const base64Image = await FileSystem.readAsStringAsync(imagedata.uri, { encoding: FileSystem.EncodingType.Base64 });
 
-        // Handle the captured picture URI
-        const source = imagedata?.uri;
-        if (source) {
-         await cameraRef.current.pausePreview();
-             }
-         data = {
-          userId: user?.emailAddresses[0]?.emailAddress,
-          image:{url: base64Image, uri:imagedata?.uri, height:imagedata?.height,width:imagedata?.width},
-        };
+  //       // Handle the captured picture URI
+  //       const source = imagedata?.uri;
+  //       if (source) {
+  //        await cameraRef.current.pausePreview();
+  //            }
+  //        data = {
+  //         userId: user?.emailAddresses[0]?.emailAddress,
+  //         image:{url: imagedata.uri},
+  //       };
     
-        GlobalApi.adduserStorage(data).then((resp) => {
-          // ToastAndroid.show("Photo added successfully", ToastAndroid.LONG);
-          Alert.alert('Success', 'Photo added successfully', [{ text: 'OK', onPress: () => console.log('OK Pressed') }]);
+  //       GlobalApi.addclosetContents(data).then((resp) => {
+  //         // ToastAndroid.show("Photo added successfully", ToastAndroid.LONG);
+  //         Alert.alert('Success', 'Photo added successfully', [{ text: 'OK', onPress: () => console.log('OK Pressed') }]);
 
-        });
-      } catch (error) {
-        console.error('Error taking picture:', error);
+  //       });
+  //     } catch (error) {
+  //       console.error('Error taking picture:', error);
+  //     }
+  //   }
+  // };
+
+  const takePicture=async()=>{
+    try {
+      let result= await ImagePicker.launchCameraAsync({
+        cameraType:ImagePicker.CameraType.back,
+        allowsEditing:true,
+        aspect:[4,3],
+        quality:1
+      });
+      if (!result.cancelled) {
+        setImage( result.assets[0].uri);
       }
+      else{
+        console.log("could not load image")
+      }
+    } catch (error) {
+      Alert.alert('Error saving the picture: '+error)
     }
-  };
+  }
   if (!permission.granted) {
     // Camera permissions are not granted yet
     return (

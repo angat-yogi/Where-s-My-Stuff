@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, ScrollView } from "react-native";
+import { View, Text, StyleSheet, ScrollView, RefreshControl } from "react-native";
 import React, { useEffect, useState } from "react";
 import Header from "./Header";
 import Slider from "./Slider";
@@ -23,15 +23,37 @@ export default function HomeScreen() {
       setStorageTypes(resp?.storageTypes);
     });
   };
+  const [refreshing, setRefreshing] = useState(false);
+
+  // Function to handle refresh action
+  const onRefresh = () => {
+    setRefreshing(true);
+    console.log("page refreshed")
+    setRefreshing(false);
+  };
+
   const sortedFashions = fashions?.sort((a, b) => b.noOfClicks - a.noOfClicks);
 
+  const isCloseToBottom = ({ layoutMeasurement, contentOffset, contentSize }) => {
+    const paddingToBottom = 20;
+    return layoutMeasurement.height + contentOffset.y >= contentSize.height - paddingToBottom;
+  };
+
+  const handleScroll = (event) => {
+    const { layoutMeasurement, contentOffset, contentSize } = event.nativeEvent;
+    if (isCloseToBottom({ layoutMeasurement, contentOffset, contentSize })) {
+      onRefresh();
+    }
+  };
   useEffect(() => {
     getCategories();
     getTrendingFashions();
     getStorageTypes();
   }, []);
   return (
-    <ScrollView contentContainerStyle={styles.scrollViewContent}>
+    <ScrollView onScroll={handleScroll}
+    scrollEventThrottle={16} // Adjust scrollEventThrottle as needed
+    refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}contentContainerStyle={styles.scrollViewContent}>
       <Header icon="camera" action="Camera" />
       <View style={{ padding: 20 }}>
         <Slider

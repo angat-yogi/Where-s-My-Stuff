@@ -4,7 +4,12 @@ import * as ImagePicker from "expo-image-picker";
 import { EvilIcons } from '@expo/vector-icons';
 import { FontAwesome } from '@expo/vector-icons';
 import Colors from "../Utils/Colors";
+import { useNavigation } from "@react-navigation/native";
+import ClothForm from "../Screens/Storage/Closet/ClothForm";
+
 export default function Gallery({ onImagesSelected,viewGallery }) {
+  const navigation = useNavigation();
+  const [selectedImageUri, setSelectedImageUri] = useState(null); 
   const [images, setImages] = useState([]);
   const pickImages = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
@@ -45,6 +50,11 @@ export default function Gallery({ onImagesSelected,viewGallery }) {
     }
   }
 
+  const handleImagePress = (imageUri) => {
+    setSelectedImageUri(imageUri); // Set the selected image URI
+    navigation.navigate("clothform", { imageUri }); // Pass imageUri as a route parameter
+  };
+
   return viewGallery && (
     <View style={{ alignItems: "center", justifyContent: "space-around", flexDirection: "column" }}>
   <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-around"}}>
@@ -57,11 +67,14 @@ export default function Gallery({ onImagesSelected,viewGallery }) {
   </View>
   <View style={{ flexDirection: "row", flexWrap: "wrap", justifyContent: "center" }}>
     {images.map((imageUri, index) => (
+     <TouchableOpacity key={index} onPress={() => handleImagePress(imageUri)}>
+
       <Image
         key={index} // Use the URI as the key
         source={{ uri: imageUri }}
         style={{ width: 100, height: 100, margin: 5 }}
       />
+      </TouchableOpacity>
     ))}
   </View>
 </View>
