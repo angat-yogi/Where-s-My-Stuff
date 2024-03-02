@@ -1,6 +1,7 @@
 import { request, gql, GraphQLClient } from "graphql-request";
 import { Alert } from "react-native";
 
+
 const URL =
   "https://api-us-west-2.hygraph.com/v2/clspbrpww0ftj01w713oecr6o/master";
 const graphQLClient = new GraphQLClient(URL, {
@@ -84,6 +85,7 @@ const addToDos = async (data) => {
 };
 
 const addclosetContents = async (data) => {
+
   let result;
 
   const mutationQuery = gql`
