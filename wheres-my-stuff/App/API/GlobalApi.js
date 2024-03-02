@@ -1,4 +1,5 @@
 import { request, gql, GraphQLClient } from "graphql-request";
+import { Alert } from "react-native";
 
 const URL =
   "https://api-us-west-2.hygraph.com/v2/clspbrpww0ftj01w713oecr6o/master";
@@ -7,6 +8,27 @@ const graphQLClient = new GraphQLClient(URL, {
     authorization: `Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6ImdjbXMtbWFpbi1wcm9kdWN0aW9uIn0.eyJ2ZXJzaW9uIjozLCJpYXQiOjE3MDgyMDkyMjAsImF1ZCI6WyJodHRwczovL2FwaS11cy13ZXN0LTIuaHlncmFwaC5jb20vdjIvY2xzcGJycHd3MGZ0ajAxdzcxM29lY3I2by9tYXN0ZXIiLCJtYW5hZ2VtZW50LW5leHQuZ3JhcGhjbXMuY29tIl0sImlzcyI6Imh0dHBzOi8vbWFuYWdlbWVudC11cy13ZXN0LTIuaHlncmFwaC5jb20vIiwic3ViIjoiZjY5YTk2NjgtNmJkZC00NzRiLWJiNzAtODYyMzA4NzUwNWE1IiwianRpIjoiY2xzcW5ueTExMGFldTAxbjVnZzJ0Mm44MyJ9.kYgGs1UpRYp0PwJ4_dic6JIZXnr8TxHLKjFilz78OC2eiiBhbwPR6OUzPjRq4v7WSSjrqzVBYSuOSbFIIr9XSAhnky3CE04CeakL79BPovHEi8UedDWXKxcnkKVLryJLkfAAPxLOypBzeWZC9m-Brw6DLRXLS4sxjr1nLxjGfggN4X0_WxT7o3t0F3GVhUZKnsFKGr-S-flOtrgGBmXVJnNRuv2bsICBB0YB4HCvC0zdz6eTeFpSpCxL8ujVTc5spA5o-U-2zIGfUUXrSAhgciiwCT1_EIjcI5jxXWrhvup2nPW8fbnW64-bBgeADdz8S6y88P71vtbTcFna-V4EYqgFRjIOtYtvkzRH4MMq6q6FR6xOiiRDFu8ty5kinqrAHwKZdsIICtgVbJWDRqHOiCHEJxwV7EChGZaPER5aSBUzOkRgBXyL0fFW4U-hbeAMqptsL3t_GEaKj8Eg98p9qHzVpeIw3P2xgELtCB32PAjrlmNObvBt0gbPPXNE68yirWFbO71_pb_KAyZk_bfC_NurP21-HSvsDch7yDiK859AVsARkw8CzxpJusNpiM8H4ymaVH71WfJ2-Dg8H09a3TuPYsTk_bZTaI3om4ZkFNvOUIYVcAJGHRRr1SnxMI3gumx3DSObEVfoloMbPVqrSBjOoO00sn-crg_pwAHCTFc`,
   },
 });
+
+const getClosetsContents = async () => {
+  let result;
+  const query = gql`
+  query GetClosetsContents {
+    userStorages {
+      imageUri
+      userEmail
+    }
+  }
+  `;
+
+  try {
+    result = await graphQLClient.request(query);
+
+  } catch (error) {
+    console.log("error on api:", error);
+  }
+  return result;
+};
+
 const getCategories = async () => {
   let result;
   const query = gql`
@@ -60,38 +82,16 @@ const addToDos = async (data) => {
   }
   return result;
 };
-const encodeImageToBase64 = async (imageUrl) => {
-  const response = await fetch(imageUrl);
-  const blob = await response.blob();
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      resolve(reader.result.split(',')[1]); // Extract Base64-encoded data from Data URL
-    };
-    reader.onerror = reject;
-    reader.readAsDataURL(blob);
-  });
-};
-const adduserStorage = async (data) => {
+
+const addclosetContents = async (data) => {
   let result;
-  const timestamp = new Date().getTime(); // Get current timestamp
-  const randomString = Math.random().toString(36).substring(2, 15); // Generate random string
-  const uniqueHandle = `${timestamp}_${randomString}`;
-  const fileName = data.image.url.substring(data.image.uri.lastIndexOf('/') + 1);
 
   const mutationQuery = gql`
   mutation createUserStorage {
     createUserStorage(
       data: {
         userEmail: "${data.userId}",
-        userStorageImage: {
-          create: {
-            fileName: "${fileName}",  
-            handle: "${uniqueHandle}",
-            width:"${data?.width}",
-            height:"${data?.height}"  
-          }
-        }
+        imageUri:"${data.imageUrl}",
       }
     ) {
       id
@@ -104,9 +104,11 @@ const adduserStorage = async (data) => {
   console.log("mutationQuery",mutationQuery)
 try {
   result = await request(URL, mutationQuery);
-  console.log(result)
+  Alert.alert('Success', 'Successfull, Closing the closet', [{ text: 'OK', onPress: () => console.log('OK Pressed') }]);
 } catch (error) {
   console.log("error on api:", error);
+  Alert.alert('Error', 'Closing the closet anyway', [{ text: 'OK', onPress: () => console.log('OK Pressed') }]);
+
 }
 return result;
 };
@@ -158,5 +160,6 @@ export default {
   getTrendingFashions,
   getStorageTypes,
   addToDos,
-  adduserStorage
+  addclosetContents,
+  getClosetsContents
 };
