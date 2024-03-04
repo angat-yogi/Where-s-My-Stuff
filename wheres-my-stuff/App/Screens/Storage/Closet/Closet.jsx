@@ -59,8 +59,8 @@ export default function Closet() {
   };
 
   useEffect(() => {
-    getStorageTypes();
-    getClosetsContents();
+    getImagesCordinatesFromAPI();
+
   }, []);
 
   useEffect(() => {
@@ -77,9 +77,6 @@ export default function Closet() {
     }
   }, [storageTypes]);
 
-  
-
-
   useEffect(() => {
     // Update coordinates when pan changes
     pan.addListener((value) => {
@@ -89,8 +86,8 @@ export default function Closet() {
       pan.removeAllListeners();
     };
   }, []);
-  const pan = useRef(new Animated.ValueXY()).current;
 
+const pan = useRef(new Animated.ValueXY()).current;
 const imageCoordinates={};
 const panResponders = storageContents.map((_, index) => {
   if (imagePositions[index]) {
@@ -99,8 +96,7 @@ const panResponders = storageContents.map((_, index) => {
       onPanResponderMove: (event, gesture) => {
         // Log the position of the dragged image
         console.log(`Image ${index} Position: x=${gesture.dx}, y=${gesture.dy}`);
-        imageCoordinates[index] = { x: gesture.dx, y: gesture.dy };
-        // Update the position of the image
+        imageCoordinates[storageContents[index]] = { x: gesture.dx, y: gesture.dy };
         Animated.event(
           [null, { dx: imagePositions[index].x, dy: imagePositions[index].y }],
           { useNativeDriver: false }
@@ -112,7 +108,50 @@ const panResponders = storageContents.map((_, index) => {
   }
 });
 
+const updateImagePositions = (coordinatesData) => {
+  console.log("imagePositions",imagePositions)
+  const updatedPositions = [...imagePositions];
+  console.log("I am here")
+console.log("updatedPositions",updatedPositions)
+  coordinatesData.forEach((coordinate) => {
+    const { imageUri, xCoordinate, yCoordinate } = coordinate;
+    const index = storageContents.findIndex((uri) => uri === imageUri);
+    if (index !== -1) {
+      updatedPositions[index] = new Animated.ValueXY({ x: xCoordinate, y: yCoordinate });
+    }
+  });
+  console.log("updatedPositions",updatedPositions)
 
+  setImagePositions(updatedPositions);
+};
+
+const getImagesCordinatesFromAPI=()=>{
+  getClosetsContents();
+  getStorageTypes();
+GlobalApi.getItemsStorageCoordinates().then((resp)=>{
+  console.log("I am here",resp)
+
+  if (resp?.userStorageItemCoordinates) {
+    updateImagePositions(resp.userStorageItemCoordinates);
+  }});
+
+}
+//API to update coordinates
+const handleApiCall = () => {
+  // Iterate over imageCoordinates
+  Object.entries(imageCoordinates).forEach(([uri, coordinates]) => {
+    const data = {
+      email: user?.emailAddresses[0]?.emailAddress,
+      uri: uri,
+      X: coordinates.x,
+      Y: coordinates.y,
+    };
+    console.log("data", data);
+    GlobalApi.addItemCoordinates(data).then(async (resp) => {
+      console.log(resp);
+    });
+  });
+};
 
   const saveImagesToDb=async()=>{
     console.log(imageCoordinates)
@@ -146,6 +185,10 @@ const panResponders = storageContents.map((_, index) => {
 
     }
   }
+
+  const handleDoneDragging=()=>{
+    handleApiCall();
+  }
   
   return closet ? (
     <View style={styles.container}>
@@ -157,50 +200,68 @@ const panResponders = storageContents.map((_, index) => {
       style={styles.image}
       source={{ uri: closet.image.url }}
     >
-      {storageContents.map((imageUri, index) => (
-  <Animated.View
-    key={index}
-    style={[
-      styles.box,
-      {
-        transform: [
-          { translateX: imagePositions[index]?.x??0 },
-          { translateY: imagePositions[index]?.y??0 },
-          { rotate: "0deg" },
-        ],
-      },
-    ]}
-    {...panResponders[index].panHandlers}
-  >
-    <Image
-      source={{ uri: imageUri }}
-      style={styles.innerBox}
-    />
-  </Animated.View>
-))}
-    </ImageBackground>
+    { storageContents.map((imageUri, index) => {
+         return (
+            <Animated.View
+              key={index}
+              style={[
+                styles.box,
+                {
+                  transform: [
+                    { translateX: imagePositions[index]?.x ?? 0 },
+                    { translateY: imagePositions[index]?.y ?? 0 },
+                    { rotate: "0deg" },
+                  ],
+                },
+              ]}
+              {...panResponders[index].panHandlers}
+            >
+              <Image
+                source={{ uri: imageUri }}
+                style={styles.innerBox}
+              />
+            </Animated.View>
+          );
+        })}
+      </ImageBackground>
   )}
-  <Gallery
-    onImagesSelected={handleImagesSelected}
-    viewGallery={true}
-  />
-  <View style={{marginLeft:width/3 }}>
-    <TouchableOpacity  
-      style={[styles.button, { marginRight: 5 ,backgroundColor:Colors.BEIGE}]}  
-      onPress={saveImagesToDb}
-    >
-      <Text style={{
-          textAlign: "center",
-          fontSize: 17,
-          color: Colors.PRIMARY,
-        }}
-      >
-        Close
-      </Text>
-    </TouchableOpacity>
-  </View>
-</ScrollView>
 
+
+</ScrollView>
+<View >
+      <Gallery
+          onImagesSelected={handleImagesSelected}
+          viewGallery={true}
+        />
+        <View style={styles.buttonContainer}>
+        <TouchableOpacity
+          style={[styles.button, { marginRight: 5, backgroundColor: Colors.BEIGE }]}
+          onPress={saveImagesToDb}
+        >
+          <Text style={{
+            textAlign: "center",
+            fontSize: 17,
+            color: Colors.PRIMARY,
+          }}
+          >
+            Close
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.button, { backgroundColor: Colors.BEIGE }]}
+          onPress={handleDoneDragging}
+        >
+          <Text style={{
+            textAlign: "center",
+            fontSize: 17,
+            color: Colors.PRIMARY,
+          }}
+          >
+            Done Dragging
+          </Text>
+        </TouchableOpacity>
+        </View>
+      </View>
     </View>
   ) : null;
 }
@@ -236,5 +297,18 @@ const styles = StyleSheet.create({
     borderRadius: 99, // Example border radius, adjust as needed
     padding: 15, // Adjust padding as needed
     marginTop: 50,
+  },
+  buttonContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    paddingHorizontal: 20,
+    paddingVertical: 1,
+    position: "relative",
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: "white",
+    borderTopWidth: 1,
+    borderTopColor: "lightgray",
   },
 });

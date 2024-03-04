@@ -26,9 +26,9 @@ export default function ProfileScreen(props) {
   if (!isLoaded) {
     return null;
   }
-  const handleLogout = () => {
+  const handleSettings = () => {
     // Navigate to the screen you want to slide in from the right
-    navigation.navigate("Home", {
+    navigation.navigate("Preference", {
       /* Optional parameters here */
     });
   };
@@ -55,18 +55,20 @@ export default function ProfileScreen(props) {
           </Text>
         </View>
       </View>
-      <View style={{ alignItems: "center", justifyContent: "center" }}>
+      <View style={styles.buttonContainer}>
         <TouchableOpacity
-          style={[styles.button, { marginRight: 5 }]}
+          style={styles.button}
+          onPress={handleSettings}
+        >
+          <Text style={styles.buttonText}>
+            Settings
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.button}
           onPress={signOut}
         >
-          <Text
-            style={{
-              textAlign: "center",
-              fontSize: 17,
-              color: Colors.PRIMARY,
-            }}
-          >
+          <Text style={styles.buttonText}>
             Log out
           </Text>
         </TouchableOpacity>
@@ -78,14 +80,22 @@ export default function ProfileScreen(props) {
   );
 }
 const styles = StyleSheet.create({
+  buttonContainer: {
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: 20,
+  },
   button: {
-    width: "48%", // Adjust width as needed
+    width: "80%",
     backgroundColor: Colors.BEIGE,
-    borderRadius: 99, // Example border radius, adjust as needed
-    padding: 5, // Adjust padding as needed
-    marginTop: 5,
-    marginBottom: 1000,
-    marginRight: 15,
+    borderRadius: 99,
+    padding: 15,
+    marginBottom: 15,
+  },
+  buttonText: {
+    textAlign: "center",
+    fontSize: 17,
+    color: Colors.PRIMARY,
   },
   userImage: {
     width: 100,
@@ -94,12 +104,6 @@ const styles = StyleSheet.create({
     position: "absolute",
     left: width / 2 - 110,
     bottom: -60,
-  },
-  profileContainer: {
-    display: "flex",
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 10,
   },
   drawerlistContainer: {
     marginTop: 110 / 2 + 10,

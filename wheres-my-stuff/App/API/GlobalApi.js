@@ -115,6 +115,69 @@ try {
 return result;
 };
 
+
+
+const addUserRoom = async (data) => {
+
+  let result;
+
+  const mutationQuery = gql`
+  mutation AddUserRoom {
+    createUserRoom(data: {roomName: "${data.roomName}", email: "${data.email}", imageOfRoom: "${data.uri}"})
+    {
+      id
+    }
+    publishManyUserRooms {
+      count
+    }
+  }
+
+  `;
+  console.log("mutationQuery",mutationQuery)
+try {
+  result = await request(URL, mutationQuery);
+  Alert.alert('Success', 'Successfully organized closet', [{ text: 'OK', onPress: () => console.log('OK Pressed') }]);
+} catch (error) {
+  console.log("error on api:", error);
+  Alert.alert('Error', 'Unsuccessful in organizing closet', [{ text: 'OK', onPress: () => console.log('OK Pressed') }]);
+
+}
+return result;
+};
+
+const addItemCoordinates = async (data) => {
+
+  let result;
+
+  const mutationQuery = gql`
+  mutation InputItemCoordinates {
+    createUserStorageItemCoordinate(
+      data: {imageUri: "${data.uri}", 
+      userEmail: "${data.email}",
+       xCoordinate: ${data.X}, 
+       yCoordinate: ${data.Y}}
+    ){
+      id
+    }
+    publishManyUserStorageItemCoordinates {
+      count
+    }
+  }
+  `;
+  console.log("mutationQuery",mutationQuery)
+try {
+  result = await request(URL, mutationQuery);
+  Alert.alert('Success', 'Successfully organized closet', [{ text: 'OK', onPress: () => console.log('OK Pressed') }]);
+} catch (error) {
+  console.log("error on api:", error);
+  Alert.alert('Error', 'Unsuccessful in organizing closet', [{ text: 'OK', onPress: () => console.log('OK Pressed') }]);
+
+}
+return result;
+};
+
+
+
 const getTrendingFashions = async () => {
   let result;
   const query = gql`
@@ -157,11 +220,36 @@ const getStorageTypes = async () => {
   return result;
 };
 
+const getItemsStorageCoordinates = async () => {
+  let result;
+  const query = gql`
+  query getItemsStorageCoordinates {
+    userStorageItemCoordinates {
+      imageUri
+      xCoordinate
+      yCoordinate
+      userEmail
+    }
+  }
+  
+  `;
+  try {
+    result = await graphQLClient.request(query);
+    console.log("coordinates",result)
+  } catch (error) {
+    console.log("error on api:", error);
+  }
+  return result;
+};
+
 export default {
   getCategories,
   getTrendingFashions,
   getStorageTypes,
   addToDos,
   addclosetContents,
-  getClosetsContents
+  getClosetsContents,
+  addItemCoordinates,
+  getItemsStorageCoordinates,
+  addUserRoom
 };

@@ -17,7 +17,7 @@ import Heading from "../../Shared/Heading";
 export default function Slider({ data, heading, isViewAll,plus, styleImage,displayHeading}) {
   const navigation = useNavigation();
   const handlePress = (action) => {
-    if(action==='closet'||action==='Camera'){
+    if(action!=null){
       navigation.navigate(action); 
     }
     else{
@@ -56,7 +56,7 @@ export default function Slider({ data, heading, isViewAll,plus, styleImage,displ
           renderItem={({ item, index }) => (
             <TouchableOpacity
               onPress={() =>
-                handlePress(item.storageTypeName?.toLowerCase() || null)
+                handlePress('room')
               }
               style={{ marginRight: 20, alignItems: "center" }}
             >

@@ -6,6 +6,7 @@ import HomeScreen from "../Screens/HomeScreen/HomeScreen";
 import CameraComponent from "../Screens/Camera/CameraComponent";
 import ClothForm from "../Screens/Storage/Closet/ClothForm";
 import Gallery from "../Shared/Gallery";
+import Room from "../Screens/HomeScreen/Room/Room";
 
 const Stack = createStackNavigator();
 export default function HomeNavigator() {
@@ -16,6 +17,7 @@ export default function HomeNavigator() {
       <Stack.Screen name="gallery" component={Gallery} />
       <Stack.Screen name="Camera" component={CameraComponent} />
       <Stack.Screen name="clothform" component={ClothForm} />
+      <Stack.Screen name="room" component={Room} />
 
     </Stack.Navigator>
   );

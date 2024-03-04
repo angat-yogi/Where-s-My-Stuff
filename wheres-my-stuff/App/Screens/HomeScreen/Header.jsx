@@ -12,7 +12,8 @@ import Colors from "../../Utils/Colors";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { FontAwesome } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
-export default function Header({ style, shouldDisplayProfile, icon, action }) {
+import Logo from "../../Shared/Logo";
+export default function Header({ style, shouldDisplayProfile, icon, action,displayName }) {
   const { user, isLoading } = useUser();
   const navigation = useNavigation();
   const handleProfilePress = () => {
@@ -33,7 +34,8 @@ export default function Header({ style, shouldDisplayProfile, icon, action }) {
                 style={styles.userImage}
               />
             </TouchableOpacity>
-            <View>
+            
+            {displayName && (<View>
               <Text
                 style={{
                   fontSize: 13,
@@ -52,7 +54,10 @@ export default function Header({ style, shouldDisplayProfile, icon, action }) {
               >
                 {user?.firstName}!
               </Text>
-            </View>
+            </View>)}
+            <View style={styles.logo}>
+              <Logo />
+              </View>
           </View>
           <TouchableOpacity onPress={() => handlePress(action)}>
             <FontAwesome name={icon} size={24} color="black" />
@@ -122,4 +127,8 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 10,
   },
+  logo:{
+    flex: 1,
+    alignContent:'center'
+  }
 });

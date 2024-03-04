@@ -73,7 +73,7 @@ export default function HomeScreen() {
         <Slider
           // isViewAll={false}
           plus={true}
-          heading="Places To Store"
+          heading="Rooms"
           data={storageTypes}
           styleImage={styles.imageFashion}
         />
