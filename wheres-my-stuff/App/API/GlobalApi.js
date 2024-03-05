@@ -177,18 +177,128 @@ return result;
 };
 
 
+
+const addUserInitialOldFurnitures = async (data) => {
+  let result;
+
+  const mutationQuery = gql`
+  mutation SaveUserRoomsWithExistingFurnitures {
+    createUserFurniture(
+      data: {userEmail: "${data.email}", 
+      room: "${data.room}", 
+      furnitures: {
+        connect: {
+          name: "${data.furniture.name}", 
+        }}}
+    ) {
+      id
+    }
+  }
+  
+  `;
+  console.log("mutationQuery",mutationQuery)
+try {
+  result = await request(URL, mutationQuery);
+} catch (error) {
+  console.log("error on api:", error);
+
+}
+return result;
+};
+
+const addUserInitialNewFurnitures = async (data) => {
+
+  let result;
+
+  const mutationQuery = gql`
+  mutation SaveUserRoomsWithNewFurnitures {
+    createUserFurniture(
+      data: {userEmail: "${data.email}", 
+      room: "${data.room}", 
+      furnitures: {
+        create: {
+          name: "${data.furniture.name}", 
+          image: "${data.furniture.image}"
+          email:"${data.furniture.email}"
+        }
+      }
+    }
+    ) {
+      id
+    }
+  }
+  
+  `;
+  console.log("mutationQuery",mutationQuery)
+try {
+  result = await request(URL, mutationQuery);
+} catch (error) {
+  console.log("error on api:", error);
+
+}
+return result;
+};
+
+const publishUserFurnitures = async () => {
+
+  let result;
+
+  const mutationQuery = gql`
+  mutation PublishUserFurnitures {
+    publishManyUserFurnitures {
+      count
+    }
+  }
+  `;
+  console.log("mutationQuery",mutationQuery)
+try {
+  result = await request(URL, mutationQuery);
+  console.log(result)
+  if(result.publishManyUserFurnitures.count>0){
+    console.log(result)
+  }
+} catch (error) {
+  console.log("error on api:", error);
+}
+return result;
+};
+
+const publishFurnitures = async () => {
+
+  let result;
+
+  const mutationQuery = gql`
+  mutation publishManyFurnitures {
+    publishManyFurnitures {
+      count
+    }
+  }
+  `;
+  console.log("mutationQuery",mutationQuery)
+try {
+  result = await request(URL, mutationQuery);
+  console.log(result)
+  if(result.publishManyFurnitures.count>0){
+    console.log(result)
+  }
+} catch (error) {
+  console.log("error on api:", error);
+}
+return result;
+};
+
 const getDefaultFurnitures = async () => {
   let result;
   const query = gql`
   query GetDefaultFurnitures {
-    furnitures {
+    furnitures(last: 100) {
       image
       name
       id
       room
+      email
     }
   }
-  
   `;
   try {
     result = await graphQLClient.request(query);
@@ -274,4 +384,8 @@ export default {
   getItemsStorageCoordinates,
   addUserRoom,
   getDefaultFurnitures,
+  addUserInitialOldFurnitures,
+  publishFurnitures,
+  publishUserFurnitures,
+  addUserInitialNewFurnitures
 };

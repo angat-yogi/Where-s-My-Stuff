@@ -29,6 +29,25 @@ const Preference = () => {
         { id: 6, name: 'Store Room',imageUri:"https://img.staticmb.com/mbcontent/images/crop/uploads/2023/1/Free-Standing-Units-for-Simple-Store-Room-Design_0_1200.jpg",furnitures:[]},
         { id: 7, name: '+ Add New Room',imageUri:"" }, // Add New Room option
     ]);
+    const [allFurnitures, setAllFurnitures] = useState([]);
+    const [error,setError]=useState(false);
+useEffect(()=>{
+    const getFurnitures = () => {
+        try{
+        GlobalApi.getDefaultFurnitures().then(async (resp) => {
+            setAllFurnitures(resp.furnitures)
+        })
+        }
+        catch(error){
+            console.error("Error fetching default furnitures:", error);
+        };
+
+        console.log("Api called from preference",allFurnitures)
+
+    };
+    getFurnitures();
+},[selectedRooms.length])
+
     useEffect(() => {
         if (roomSelectionCompleted) {
             setModalVisible(true); // Open the modal when room selection is completed
@@ -50,19 +69,48 @@ const Preference = () => {
 
     // };
 
-     const doneClicked=()=>{
-        console.log("done clicked, here is the final data that is going to the api",selectedRooms)
-        selectedRooms&&selectedRooms.map((r)=>{
-            console.log(r.id);
-            console.log(r.name);
-            console.log(r.imageUri);
-            r.furnitures&&r.furnitures.map(f=>{
-                console.log(f.name)
-            })
-        })
+    const doneClicked = async () => {
+        if (!selectedRooms) {
+            return; // Exit if no rooms are selected
+        }
+    
+        for (const room of selectedRooms) {
+            for (const furniture of room.furnitures || []) {
+                const data = {
+                    email: user?.emailAddresses[0].emailAddress,
+                    room: room.name,
+                    furniture: {
+                        name: furniture.name,
+                        image: furniture.image[0],
+                        room:furniture.room,
+                        email:user.emailAddresses[0].emailAddress
+                    }
+                };
+    
+                console.log("data going into API",data)
+                try {
+                    const furnitureExists = allFurnitures.some(existingFurniture => existingFurniture.name === furniture.name);
+                    if (furnitureExists) {
+                        console.log(`Furniture ${furniture.name} already exists.`);
+                        GlobalApi.addUserInitialOldFurnitures(data).then(async(resp)=>{
+                            console.log("resp from existing",resp)
+                        })
+                    } else {
+                        console.log(`Furniture ${furniture.name} does not exists.`);
+                        GlobalApi.addUserInitialNewFurnitures(data).then(async(resp)=>{
+                            console.log("resp from new",resp)
+                        })
+                    }
+                } catch (error) {
+                    console.log("Error adding furniture:", error);
+                    setError(true)
+                }
+            }
+        }
+
         Alert.alert(
             "Are you sure?",
-            "This will close the customization for you and take you to home page",
+            "This will close the customization for you and take you to the home page",
             [
                 {
                     text: "Cancel",
@@ -71,17 +119,38 @@ const Preference = () => {
                 },
                 {
                     text: "OK",
-                    onPress: () => {
+                    onPress: async () => {
                         // Close the modal
                         setModalVisible(false);
-                        // Navigate to the desired page
-                        navigation.navigate("Go Back");
+                        // Publish furnitures
+                        try {
+                            if(!error){
+                                setError(false)
+                               await GlobalApi.publishFurnitures().then(async (resp) => {
+                                    console.log(`success in publishing all the furnitures for user: ${user.firstName}`, resp);
+                                 });
+                            }
+                    
+                            if(!error){
+                                setError(false)
+                                await GlobalApi.publishUserFurnitures().then(async (resp) => {
+                                    console.log(`success in publishing all the user furnitures for user: ${user.firstName}`, resp);
+                                 });
+                                }
+                            navigation.navigate("Go Back");
+                        } catch (error) {
+                            console.error("Error publishing furnitures:", error);
+                            // Handle error appropriately
+                        }
                     }
                 }
             ],
             { cancelable: false }
         );
-    }
+        
+         
+    };
+    
 
 
     const toggleRoomSelection = (room) => {
@@ -132,26 +201,6 @@ const handleNavigateToStorageTypes = () => {
     else{
         console.log('Clicked')
         setRoomSelectionCompleted(true)
-        // let data = {};
-
-        // selectedRooms.forEach(selectedRoom => {
-        //     // Create a new object for each selected room
-        //     const roomData = {
-        //         imageUri: selectedRoom.imageUri,
-        //         email: user?.emailAddresses[0]?.emailAddress,
-        //         roomName: selectedRoom.name
-        //     };
-
-        //     // Store the room data using the room's ID as the key
-        //         data[selectedRoom.id] = roomData;
-        // });
-
-        // Object.values(data).forEach(room=>{
-        //     GlobalApi.addUserRoom(room).then(async (resp)=>{
-        //         console.log(resp)
-        //     })
-        // })
-        //pass selected Rooms to API
         setModalVisible(roomSelectionCompleted)
         console.log("modal from prefrence",modalVisible)
     }
