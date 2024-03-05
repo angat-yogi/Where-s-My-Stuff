@@ -6,8 +6,10 @@ import { Ionicons } from '@expo/vector-icons';
 import { AntDesign } from '@expo/vector-icons';
 import GlobalApi from '../../API/GlobalApi';
 import ImageOrCamera from '../ImageOrCamera';
+import { useUser } from '@clerk/clerk-expo';
 
 const RoomModal = ({ modalVisible, data, onNext, setModalVisible, onClose,onPrev,disbaleNextBtn,disablePrevButton,totalRooms,roomIndex,doneClicked }) => {
+    const { user, isLoading } = useUser();
     const [loading, setLoading] = useState(true); // State variable to track loading state
     const [openCameraModal,setOpenCameraModal]=useState(false)
     const [imageUri,setImageUri]=useState(null)
@@ -17,10 +19,11 @@ useEffect(()=>{
     const getFurnitures = () => {
         try{
         GlobalApi.getDefaultFurnitures().then(async (resp) => {
-            const nullRoomFurnitures = resp.furnitures.filter(item => item.room === null);
+            const nullRoomFurnitures = resp.furnitures.filter(item => item.email === 'admin@wms.com'||item.email === user.emailAddresses[0].emailAddress);
             const matchingRoomFurnitures = resp.furnitures.filter(item => item.room && item.room.toLowerCase() === data.name.toLowerCase());
-            const filteredFurnitures = [...nullRoomFurnitures, ...matchingRoomFurnitures];
-            setAllFurnitures(resp.furnitures.length)
+            const filteredFurnitures = Array.from(new Set([...nullRoomFurnitures, ...matchingRoomFurnitures]));
+            
+            setAllFurnitures(resp.furnitures)
             setFurnitures(filteredFurnitures);
             setLoading(false)
         })
@@ -52,6 +55,7 @@ useEffect(()=>{
         } else {
             setSelectedFurnitures([...selectedFurnitures, furniture]);
         }
+        console.log("selectedFurnitures",selectedFurnitures)
     };
 
     const prevClicked=()=>{
@@ -81,9 +85,15 @@ useEffect(()=>{
             Alert.alert("Invalid Name","Furniture name  or Image can not be empty");
             return null;
         }
-        const newFurniture = { id: allFurnitures + 1, name: newFurnitureName,image:[imageUri] };
+
+        if (allFurnitures.some(furniture => furniture.name.toLowerCase() === newFurnitureName.toLocaleLowerCase())) {
+            Alert.alert("Duplicate Name", "A furniture with the same name already exists");
+            return;
+        }
+        const newFurniture = { id: allFurnitures.length + 1, name: newFurnitureName,image:[imageUri] };
         console.log("adding new furniture",newFurniture)
         setFurnitures([...furnitures, newFurniture]);
+        setAllFurnitures([...allFurnitures,newFurniture])
         // Reset the form and hide it
         setNewFurnitureName('');
         setImageUri(null)
