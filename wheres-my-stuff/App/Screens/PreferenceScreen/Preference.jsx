@@ -48,6 +48,31 @@ useEffect(()=>{
     getFurnitures();
 },[selectedRooms.length])
 
+useEffect(()=>{
+    const getRooms = () => {
+        try{
+        GlobalApi.getDefaultRooms().then(async (resp) => {
+            // const nullRoomFurnitures = resp.furnitures.filter(item => item.email === 'admin@wms.com');
+            // const matchingRoomFurnitures = resp.furnitures.filter(item => item.room && item.room.toLowerCase() === data.name.toLowerCase());
+            // const filteredFurnitures = Array.from(new Set([...nullRoomFurnitures, ...matchingRoomFurnitures]));
+            
+            // setAllFurnitures(resp.furnitures)
+            // setFurnitures(filteredFurnitures);
+            //setRooms(resp.rooms)
+            console.log("resp",resp.rooms)
+        })
+        }
+        catch(error){
+            console.error("Error fetching default furnitures:", error);
+        };
+
+        console.log("Api called",rooms)
+
+    };
+    getRooms();
+},[])
+
+
     useEffect(() => {
         if (roomSelectionCompleted) {
             setModalVisible(true); // Open the modal when room selection is completed

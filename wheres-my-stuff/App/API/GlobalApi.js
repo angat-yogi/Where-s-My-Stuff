@@ -309,6 +309,28 @@ const getDefaultFurnitures = async () => {
 };
 
 
+const getDefaultRooms = async () => {
+  let result;
+  const query = gql`
+  query GetDefaultRooms {
+    rooms(last:100) {
+      id
+      imageUri
+      roomDisplayName
+      roomType
+    }
+  }
+  
+  `;
+  try {
+    result = await graphQLClient.request(query);
+  } catch (error) {
+    console.log("error on api:", error);
+  }
+  return result;
+};
+
+
 const getTrendingFashions = async () => {
   let result;
   const query = gql`
@@ -387,5 +409,6 @@ export default {
   addUserInitialOldFurnitures,
   publishFurnitures,
   publishUserFurnitures,
-  addUserInitialNewFurnitures
+  addUserInitialNewFurnitures,
+  getDefaultRooms
 };
