@@ -20,14 +20,13 @@ const Preference = () => {
     const [image, setImage] = useState(null);
     const [skip,setSkip]=useState(false);
     const [modalVisible, setModalVisible] = useState(false); // Initialize modal visibility state as false
-
     const [rooms,setRooms] = useState([
-        { id: 1, name: 'Living Room',imageUri:"https://media.architecturaldigest.com/photos/64f71af50a84399fbdce2f6a/16:9/w_2560%2Cc_limit/Living%2520with%2520Lolo%2520Photo%2520Credit_%2520Life%2520Created%25204.jpg" },
-        { id: 2, name: 'Bedroom',imageUri:"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTEQcT8uoUn58QbzQV5k12g61GMUu6Io7nH3g&usqp=CAU" },
-        { id: 3, name: 'Kitchen',imageUri:"https://stylebyemilyhenderson.com/wp-content/uploads/2023/03/Emily-Henderson_Small-Kitchen-Ideas_7.jpg" },
-        { id: 4, name: 'Bathroom',imageUri:"https://images.thdstatic.com/lifestyleimages/1024x682/b3c414af-4a89-4ba9-9ba9-3e91a8b697d40.jpeg" },
-        { id: 5, name: 'Garage',imageUri:"https://www.southernliving.com/thmb/eHRQ7ZS7AFXBdQU2wXk6b2rmEuU=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/GettyImages-528098460-2000-6cf3c18930e847faa18842c9eb84c3cf.jpg" },
-        { id: 6, name: 'Store Room',imageUri:"https://img.staticmb.com/mbcontent/images/crop/uploads/2023/1/Free-Standing-Units-for-Simple-Store-Room-Design_0_1200.jpg" },
+        { id: 1, name: 'Living Room',imageUri:"https://media.architecturaldigest.com/photos/64f71af50a84399fbdce2f6a/16:9/w_2560%2Cc_limit/Living%2520with%2520Lolo%2520Photo%2520Credit_%2520Life%2520Created%25204.jpg",furnitures:[] },
+        { id: 2, name: 'Bedroom',imageUri:"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTEQcT8uoUn58QbzQV5k12g61GMUu6Io7nH3g&usqp=CAU" ,furnitures:[]},
+        { id: 3, name: 'Kitchen',imageUri:"https://stylebyemilyhenderson.com/wp-content/uploads/2023/03/Emily-Henderson_Small-Kitchen-Ideas_7.jpg",furnitures:[] },
+        { id: 4, name: 'Bathroom',imageUri:"https://images.thdstatic.com/lifestyleimages/1024x682/b3c414af-4a89-4ba9-9ba9-3e91a8b697d40.jpeg",furnitures:[] },
+        { id: 5, name: 'Garage',imageUri:"https://www.southernliving.com/thmb/eHRQ7ZS7AFXBdQU2wXk6b2rmEuU=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/GettyImages-528098460-2000-6cf3c18930e847faa18842c9eb84c3cf.jpg",furnitures:[] },
+        { id: 6, name: 'Store Room',imageUri:"https://img.staticmb.com/mbcontent/images/crop/uploads/2023/1/Free-Standing-Units-for-Simple-Store-Room-Design_0_1200.jpg",furnitures:[]},
         { id: 7, name: '+ Add New Room',imageUri:"" }, // Add New Room option
     ]);
     useEffect(() => {
@@ -50,6 +49,40 @@ const Preference = () => {
     //     console.log("selectedRooms after removed",selectedRooms)
 
     // };
+
+     const doneClicked=()=>{
+        console.log("done clicked, here is the final data that is going to the api",selectedRooms)
+        selectedRooms&&selectedRooms.map((r)=>{
+            console.log(r.id);
+            console.log(r.name);
+            console.log(r.imageUri);
+            r.furnitures&&r.furnitures.map(f=>{
+                console.log(f.name)
+            })
+        })
+        Alert.alert(
+            "Are you sure?",
+            "This will close the customization for you and take you to home page",
+            [
+                {
+                    text: "Cancel",
+                    onPress: () => console.log("Cancel Pressed"),
+                    style: "cancel"
+                },
+                {
+                    text: "OK",
+                    onPress: () => {
+                        // Close the modal
+                        setModalVisible(false);
+                        // Navigate to the desired page
+                        navigation.navigate("Go Back");
+                    }
+                }
+            ],
+            { cancelable: false }
+        );
+    }
+
 
     const toggleRoomSelection = (room) => {
         setSelectedRooms(prevSelectedRooms => {
@@ -158,7 +191,7 @@ const handleNavigateToStorageTypes = () => {
                 {selectedRooms.length!=0?(<Text style={styles.nextButtonText}>Next: Choose Storage Types</Text>):(<Text style={styles.nextButtonText}>Skip</Text>)}
         </TouchableOpacity>
        </View>
-        {roomSelectionCompleted&&selectedRooms.length!==0&&<StorageTypeByRoom selectedRooms={[...selectedRooms]} handleNavigateToStorageTypes={handleNavigateToStorageTypes} modalVisible={modalVisible} setModalVisible={setModalVisible}/>}
+        {roomSelectionCompleted&&selectedRooms.length!==0&&<StorageTypeByRoom selectedRooms={[...selectedRooms]} handleNavigateToStorageTypes={handleNavigateToStorageTypes} modalVisible={modalVisible} setModalVisible={setModalVisible} doneClicked={doneClicked}/>}
         </ScrollView>
     );
 };

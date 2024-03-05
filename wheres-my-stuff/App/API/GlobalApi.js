@@ -177,6 +177,27 @@ return result;
 };
 
 
+const getDefaultFurnitures = async () => {
+  let result;
+  const query = gql`
+  query GetDefaultFurnitures {
+    furnitures {
+      image
+      name
+      id
+      room
+    }
+  }
+  
+  `;
+  try {
+    result = await graphQLClient.request(query);
+  } catch (error) {
+    console.log("error on api:", error);
+  }
+  return result;
+};
+
 
 const getTrendingFashions = async () => {
   let result;
@@ -251,5 +272,6 @@ export default {
   getClosetsContents,
   addItemCoordinates,
   getItemsStorageCoordinates,
-  addUserRoom
+  addUserRoom,
+  getDefaultFurnitures,
 };

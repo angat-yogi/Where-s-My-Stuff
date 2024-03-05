@@ -136,13 +136,7 @@ const styles = StyleSheet.create({
         width: '80%',
         marginBottom: 20,
     },
-    addButton: {
-        backgroundColor: 'green',
-        paddingVertical: 10,
-        paddingHorizontal: 20,
-        borderRadius: 10,
-        marginBottom: 10,
-    },
+    
     addButtonText: {
         color: 'white',
         fontSize: 18,
@@ -152,6 +146,7 @@ const styles = StyleSheet.create({
         paddingVertical: 10,
         paddingHorizontal: 20,
         borderRadius: 10,
+        marginBottom:10
     },
     closeButtonText: {
         color: 'white',
@@ -159,5 +154,12 @@ const styles = StyleSheet.create({
     },
     disabledButton: {
         opacity: 0.5, // Reduced opacity for a disabled look
+    },
+    addButton: {
+        backgroundColor: 'green',
+        paddingVertical: 10,
+        paddingHorizontal: 20,
+        borderRadius: 10,
+        marginBottom: 10,
     },
 });

@@ -1,15 +1,42 @@
-import React, { useState } from 'react';
-import { View, Text, Modal, StyleSheet, TouchableOpacity, Image, Dimensions, ScrollView, TextInput, KeyboardAvoidingView } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, Modal, StyleSheet, TouchableOpacity, Image, Dimensions, ScrollView, TextInput, KeyboardAvoidingView, PanResponder, Alert, ActivityIndicator } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { FontAwesome6 } from '@expo/vector-icons';
-const RoomModal = ({ modalVisible, data, onNext, setModalVisible, onClose }) => {
-    const [furnitures, setFurnitures] = useState([
-        { id: 1, name: 'Closet' },
-        { id: 2, name: 'Table' },
-        { id: 3, name: 'Drawer' },
-        { id: 4, name: 'Second Table' },
-        { id: 5, name: 'Bed' },
-    ]);
+import { Ionicons } from '@expo/vector-icons';
+import { AntDesign } from '@expo/vector-icons';
+import GlobalApi from '../../API/GlobalApi';
+import ImageOrCamera from '../ImageOrCamera';
+
+const RoomModal = ({ modalVisible, data, onNext, setModalVisible, onClose,onPrev,disbaleNextBtn,disablePrevButton,totalRooms,roomIndex,doneClicked }) => {
+    const [loading, setLoading] = useState(true); // State variable to track loading state
+    const [openCameraModal,setOpenCameraModal]=useState(false)
+    const [imageUri,setImageUri]=useState(null)
+    const [allFurnitures, setAllFurnitures] = useState([]);
+
+useEffect(()=>{
+    const getFurnitures = () => {
+        try{
+        GlobalApi.getDefaultFurnitures().then(async (resp) => {
+            const nullRoomFurnitures = resp.furnitures.filter(item => item.room === null);
+            const matchingRoomFurnitures = resp.furnitures.filter(item => item.room && item.room.toLowerCase() === data.name.toLowerCase());
+            const filteredFurnitures = [...nullRoomFurnitures, ...matchingRoomFurnitures];
+            setAllFurnitures(resp.furnitures.length)
+            setFurnitures(filteredFurnitures);
+            setLoading(false)
+        })
+        }
+        catch(error){
+            console.error("Error fetching default furnitures:", error);
+        };
+
+        console.log("Api called",furnitures)
+
+    };
+    getFurnitures();
+},[data.name])
+
+    
+    const [furnitures, setFurnitures] = useState([]);
     const [selectedFurnitures, setSelectedFurnitures] = useState([]);
     const [showAddFurnitureForm, setShowAddFurnitureForm] = useState(false);
     const [newFurnitureName, setNewFurnitureName] = useState('');
@@ -27,23 +54,58 @@ const RoomModal = ({ modalVisible, data, onNext, setModalVisible, onClose }) => 
         }
     };
 
+    const prevClicked=()=>{
+        setSelectedFurnitures([]);
+        onPrev();
+        setShowAddFurnitureForm(false)
+
+    }
+
+    const nextClicked=()=>{
+        data.furnitures=selectedFurnitures;
+        setSelectedFurnitures([]);
+
+        onNext()
+        setShowAddFurnitureForm(false)
+
+    }
+
+    
     const handleAddFurniture = () => {
         setShowAddFurnitureForm(true);
     };
 
     const handleSubmitNewFurniture = () => {
         // Add the new furniture to the list
-        const newFurniture = { id: furnitures.length + 1, name: newFurnitureName };
+        if(newFurnitureName.trim()===''||newFurnitureName==null||imageUri===null){
+            Alert.alert("Invalid Name","Furniture name  or Image can not be empty");
+            return null;
+        }
+        const newFurniture = { id: allFurnitures + 1, name: newFurnitureName,image:[imageUri] };
+        console.log("adding new furniture",newFurniture)
         setFurnitures([...furnitures, newFurniture]);
         // Reset the form and hide it
         setNewFurnitureName('');
+        setImageUri(null)
         setShowAddFurnitureForm(false);
     };
 
+   
     const windowWidth = Dimensions.get('window').width;
     const windowHeight = Dimensions.get('window').height;
 
+
+
+    if (loading) {
+        return (
+            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                <ActivityIndicator size="large" color="blue" />
+            </View>
+        );
+    }
+
     return (
+        <ScrollView contentContainerStyle={styles.scrollViewContainer}>
         <Modal
             animationType="slide"
             transparent={true}
@@ -55,56 +117,99 @@ const RoomModal = ({ modalVisible, data, onNext, setModalVisible, onClose }) => 
                     <Text style={styles.modalTitle}>{data.name}</Text>
                     {data.imageUri && <Image source={{ uri: data.imageUri }} style={styles.selectedImage} />}
                     <Text style={styles.modalDescription}>This is where you can customize your living room storage options.</Text>
+                    
                     <ScrollView horizontal={true}  showsHorizontalScrollIndicator={false} contentContainerStyle={styles.furnitureOptionsContainer}>
-                        {furnitures.map((furniture) => (
-                            <TouchableOpacity key={furniture.id} onPress={() => toggleFurnitureSelection(furniture)}>
-                                <View style={[styles.furnitureOption, selectedFurnitures.some((item) => item.id === furniture.id) && styles.selectedFurnitureOption]}>
-                                    <Text>{furniture.name}</Text>
-                                </View>
-                            </TouchableOpacity>
-                        ))}
-                        <TouchableOpacity onPress={handleAddFurniture}>
-                            <View style={styles.furnitureOption}>
-                                <Text>+ Add</Text>
-                            </View>
-                        </TouchableOpacity>
+                    {furnitures.map((furniture) => (
+                    <TouchableOpacity key={furniture.id} onPress={() => toggleFurnitureSelection(furniture)}>
+                        <View style={[styles.furnitureOption, selectedFurnitures.some((item) => item.id === furniture.id) && styles.selectedFurnitureOption]}>
+                            {furniture.image?.length > 0 && <Image source={{ uri:  furniture.image[0] }} style={styles.furnitureImage} />}
+                            <Text style={styles.furnitureName}>{furniture.name}</Text>
+                        </View>
+                    </TouchableOpacity>
+                         ))}
+
+                    <TouchableOpacity onPress={handleAddFurniture} style={styles.addButtonContainer}>
+                        <View style={styles.addButton}>
+                            <Text style={styles.addButtonText}>+ Add</Text>
+                        </View>
+                    </TouchableOpacity>
+
                     </ScrollView>
                     {showAddFurnitureForm && (
                         <View style={styles.addFurnitureForm}>
-                            <TextInput
-                                placeholder="Enter furniture name"
-                                value={newFurnitureName}
-                                onChangeText={setNewFurnitureName}
-                                style={styles.input}
-                            />
-                            <TouchableOpacity onPress={handleSubmitNewFurniture}>
-                                <View style={[styles.addButton,{marginRight:10}]}>
-                                    <Text style={styles.buttonText}><FontAwesome6 name="add" size={20} color="green" /></Text>
-                                </View>
-                            </TouchableOpacity>
-                            <TouchableOpacity onPress={()=>setShowAddFurnitureForm(false)}>
-                                <View style={styles.cancelBtn}>
-                                    <Text style={styles.buttonText}><MaterialCommunityIcons name="cancel" size={20} color="red" /></Text>
-                                </View>
-                            </TouchableOpacity>
+                            <View style={styles.imageContainer}>
+                                <TextInput
+                                    placeholder="Enter furniture name"
+                                    value={newFurnitureName}
+                                    onChangeText={setNewFurnitureName}
+                                    style={styles.input}
+                                />
+                            </View>
+                            <View style={styles.buttonRow}>
+                                <TouchableOpacity onPress={()=>setOpenCameraModal(true)}>
+                            {imageUri ?(<TouchableOpacity onPress={()=>setOpenCameraModal(true)}><Image source={{ uri: imageUri }} style={styles.furnitureImageForm} /></TouchableOpacity>):(             
+                            <View style={[styles.addButtonForm, { marginRight: 10 }]}>
+                            <Text style={styles.buttonText}><FontAwesome6 name="image" size={20} color="green" /></Text>
+                            </View>
+                            )}
+                                </TouchableOpacity>
+                                <TouchableOpacity onPress={handleSubmitNewFurniture}>
+                                    <View style={[styles.addButtonForm, { marginRight: 10 }]}>
+                                        <Text style={styles.buttonText}><FontAwesome6 name="add" size={20} color="green" /></Text>
+                                    </View>
+                                </TouchableOpacity>
+                                <TouchableOpacity onPress={() => setShowAddFurnitureForm(false)}>
+                                    <View style={styles.cancelBtn}>
+                                        <Text style={styles.buttonText}><MaterialCommunityIcons name="cancel" size={20} color="red" /></Text>
+                                    </View>
+                                </TouchableOpacity>
+                            </View>
+                            {openCameraModal&&(<ImageOrCamera isVisible={openCameraModal} setOpenCameraModal={setOpenCameraModal} displayCamera={true} displayImagePicker={true} imageUri={imageUri} setImageUri={setImageUri}/>)}
                         </View>
                     )}
                     <View style={styles.buttonContainer}>
-                        <TouchableOpacity style={[styles.skipButton, { marginRight: 10 }]} onPress={onNext}>
-                            <Text style={styles.closeButtonText}>Next</Text>
-                        </TouchableOpacity>
+                    <TouchableOpacity  
+                        style={[styles.skipButton, { 
+                            marginRight: 10,
+                            opacity: disablePrevButton ? 0.5 : 1, // Adjust opacity based on disabled state
+                            backgroundColor: disablePrevButton ? '#CCCCCC' : 'transparent', // Change background color based on disabled state
+                            borderWidth: disablePrevButton ? 0 : 1, // Remove border when disabled
+                        }]} 
+                        onPress={prevClicked} 
+                        disabled={disablePrevButton}
+                    >
+                        <Text style={styles.closeButtonText}>
+                            <AntDesign name="caretleft" size={24} color={disablePrevButton ? '#999999' : 'black'} /> {/* Change icon color based on disabled state */}
+                        </Text>
+                    </TouchableOpacity>
+                   
+                    <TouchableOpacity  
+                        style={[styles.skipButton]} 
+                        onPress={disbaleNextBtn&&(roomIndex===totalRooms-1)?doneClicked:nextClicked} >
+                        <Text style={styles.closeButtonText}>
+                            {disbaleNextBtn&&(roomIndex===totalRooms-1)?(<Ionicons name="checkmark-done" size={24} color={'green'}  />):(<AntDesign name="caretright" size={24} color={disbaleNextBtn &&(roomIndex===totalRooms-1)? '#999999' : 'green'} />)} {/* Change icon color based on disabled state */}
+                        </Text>
+                    </TouchableOpacity>
+
+
                         <TouchableOpacity style={[styles.closeButton]} onPress={handleCloseModal}>
-                            <Text style={styles.closeButtonText}>Close</Text>
+                            <Text style={styles.closeButtonText}><AntDesign name="close" size={24} color="red" /></Text>
                         </TouchableOpacity>
                     </View>
                 </KeyboardAvoidingView>
             </View>
         </Modal>
+        </ScrollView>
     );
 };
 export default RoomModal;
 
 const styles = StyleSheet.create({
+    scrollViewContainer: {
+        flexGrow: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
     modalContainer: {
         flex: 1,
         justifyContent: 'center',
@@ -130,20 +235,25 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between', // Optional: Adjust as needed
         marginTop: 10, // Optional: Adjust as needed
+        marginBottom:10
     },
     closeButton: {
-        backgroundColor: 'red',
+        backgroundColor: 'transparent',
         padding: 10,
         borderRadius: 5,
+        borderWidth:1
     },
     closeButtonText: {
         fontSize: 16,
         fontWeight: 'bold',
+        
     },
     skipButton: {
-        backgroundColor: 'lightgray',
+        backgroundColor: 'transparent',
         padding: 10,
         borderRadius: 5,
+        borderWidth:1,
+        marginRight:10
     },
     selectedImage: {
         width: 200,
@@ -153,24 +263,48 @@ const styles = StyleSheet.create({
     furnitureOptionsContainer: {
         flexDirection: 'row',
         marginBottom: 20,
+        marginTop:20
     },
     furnitureOption: {
-        width: 80,
-        height: 60,
-        backgroundColor: 'lightblue',
-        justifyContent: 'center',
+        width: 100, // Adjust width as needed
         alignItems: 'center',
-        marginHorizontal: 5,
-        borderRadius: 10,
+        marginHorizontal: 5, // Adjust horizontal margin as needed
+        marginBottom: 10, // Add margin bottom for spacing between images
+    },
+    furnitureImage: {
+        width: 80, // Adjust width as needed
+        height: 80, // Adjust height as needed
+        marginBottom: 5,
+        marginTop:5,
+        borderRadius:10
+    },
+    furnitureImageForm: {
+        width: 50, // Adjust width as needed
+        height: 50, // Adjust height as needed
+        marginBottom: 2,
+        borderRadius:10,
+        marginRight:10
+
+    },
+    furnitureName: {
+        textAlign: 'center',
     },
     selectedFurnitureOption: {
         backgroundColor: 'lightgreen',
     },
     addFurnitureForm: {
         marginTop: 10,
+    },
+    imageContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 10,
+    },
+    buttonRow: {
         flexDirection: 'row',
         alignItems: 'center',
     },
+
     input: {
         flex: 1,
         height: 40,
@@ -180,11 +314,30 @@ const styles = StyleSheet.create({
         marginRight: 10,
         paddingHorizontal: 10,
     },
-    addButton: {
+    addButtonForm: {
         backgroundColor: 'lightgrey',
         paddingVertical: 10,
         paddingHorizontal: 20,
         borderRadius: 5,
+    },
+    addButtonContainer: {
+        marginRight: 5, // Adjust margin right as needed
+    },
+    addButton: {
+        width: 100, // Adjust width as needed
+        height: 110, // Adjust height as needed
+        backgroundColor: 'lightblue',
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginHorizontal: 5, // Adjust horizontal margin as needed
+        marginBottom: 10, // Add margin bottom for spacing between images
+        borderRadius: 10,
+        borderWidth:1
+    },
+    addButtonText: {
+        textAlign: 'center',
+        fontSize:18,
+        fontWeight:'bold'
     },
     cancelBtn: {
         backgroundColor: 'lightgrey',
