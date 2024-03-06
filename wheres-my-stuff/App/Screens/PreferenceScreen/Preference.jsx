@@ -20,17 +20,11 @@ const Preference = () => {
     const [image, setImage] = useState(null);
     const [skip,setSkip]=useState(false);
     const [modalVisible, setModalVisible] = useState(false); // Initialize modal visibility state as false
-    const [rooms,setRooms] = useState([
-        { id: 1, name: 'Living Room',imageUri:"https://media.architecturaldigest.com/photos/64f71af50a84399fbdce2f6a/16:9/w_2560%2Cc_limit/Living%2520with%2520Lolo%2520Photo%2520Credit_%2520Life%2520Created%25204.jpg",furnitures:[] },
-        { id: 2, name: 'Bedroom',imageUri:"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTEQcT8uoUn58QbzQV5k12g61GMUu6Io7nH3g&usqp=CAU" ,furnitures:[]},
-        { id: 3, name: 'Kitchen',imageUri:"https://stylebyemilyhenderson.com/wp-content/uploads/2023/03/Emily-Henderson_Small-Kitchen-Ideas_7.jpg",furnitures:[] },
-        { id: 4, name: 'Bathroom',imageUri:"https://images.thdstatic.com/lifestyleimages/1024x682/b3c414af-4a89-4ba9-9ba9-3e91a8b697d40.jpeg",furnitures:[] },
-        { id: 5, name: 'Garage',imageUri:"https://www.southernliving.com/thmb/eHRQ7ZS7AFXBdQU2wXk6b2rmEuU=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/GettyImages-528098460-2000-6cf3c18930e847faa18842c9eb84c3cf.jpg",furnitures:[] },
-        { id: 6, name: 'Store Room',imageUri:"https://img.staticmb.com/mbcontent/images/crop/uploads/2023/1/Free-Standing-Units-for-Simple-Store-Room-Design_0_1200.jpg",furnitures:[]},
-        { id: 7, name: '+ Add New Room',imageUri:"" }, // Add New Room option
-    ]);
+    const [rooms,setRooms] = useState([ ]);
     const [allFurnitures, setAllFurnitures] = useState([]);
     const [error,setError]=useState(false);
+    const [selectedRoomType, setSelectedRoomType] = React.useState(null);
+
 useEffect(()=>{
     const getFurnitures = () => {
         try{
@@ -52,13 +46,8 @@ useEffect(()=>{
     const getRooms = () => {
         try{
         GlobalApi.getDefaultRooms().then(async (resp) => {
-            // const nullRoomFurnitures = resp.furnitures.filter(item => item.email === 'admin@wms.com');
-            // const matchingRoomFurnitures = resp.furnitures.filter(item => item.room && item.room.toLowerCase() === data.name.toLowerCase());
-            // const filteredFurnitures = Array.from(new Set([...nullRoomFurnitures, ...matchingRoomFurnitures]));
-            
-            // setAllFurnitures(resp.furnitures)
-            // setFurnitures(filteredFurnitures);
-            //setRooms(resp.rooms)
+            const customizedRoomsForUser=resp.rooms.filter(r=>r.addedBy==='admin@wms.com'||r.addedBy===user?.emailAddresses[0].emailAddress)
+            setRooms(customizedRoomsForUser)
             console.log("resp",resp.rooms)
         })
         }
@@ -78,21 +67,7 @@ useEffect(()=>{
             setModalVisible(true); // Open the modal when room selection is completed
         }
     }, [roomSelectionCompleted]);
-    // const toggleRoomSelection = (room) => {
-    //     console.log(rooms);
-    //     console.log("selectedRooms",selectedRooms)
-    //     if (room.id === 7) {
-    //         setIsAddingNewRoom(true);
-    //     } else {
-    //         if (selectedRooms.some((selectedRoom) => selectedRoom.id === room.id)) {
-    //             setSelectedRooms(selectedRooms.filter((selectedRoom) => selectedRoom.id !== room.id));
-    //         } else {
-    //             setSelectedRooms([...selectedRooms, room]);
-    //         }
-    //     }
-    //     console.log("selectedRooms after removed",selectedRooms)
 
-    // };
 
     const doneClicked = async () => {
         if (!selectedRooms) {
@@ -103,7 +78,7 @@ useEffect(()=>{
             for (const furniture of room.furnitures || []) {
                 const data = {
                     email: user?.emailAddresses[0].emailAddress,
-                    room: room.name,
+                    room: room.roomDisplayName,
                     furniture: {
                         name: furniture.name,
                         image: furniture.image[0],
@@ -180,16 +155,11 @@ useEffect(()=>{
 
     const toggleRoomSelection = (room) => {
         setSelectedRooms(prevSelectedRooms => {
-            if (room.id === 7) {
-                setIsAddingNewRoom(true);
-                return prevSelectedRooms; // No change to selectedRooms when adding a new room
-            } else {
                 const isSelected = prevSelectedRooms.some(selectedRoom => selectedRoom.id === room.id);
                 const updatedRooms = isSelected
                     ? prevSelectedRooms.filter(selectedRoom => selectedRoom.id !== room.id) // Deselect the room
                     : [...prevSelectedRooms, room]; // Select the room
                 return updatedRooms;
-            }
         });
         console.log("selectedRooms after removed",selectedRooms)
 
@@ -197,22 +167,46 @@ useEffect(()=>{
     
  
     const handleAddRoom = () => {
-    if (newRoomName.trim() !== '') {
-        let roomExists=rooms.find(r=>r.name.toLowerCase()===newRoomName.trim().toLowerCase());
+        console.log("called this method")
+    if (newRoomName.trim() !== ''&&selectedRoomType!== null&&image.trim() !== '') {
+        let roomExists=rooms.find(r=>r.roomDisplayName.toLowerCase()===newRoomName.trim().toLowerCase());
         if(roomExists){
             Alert.alert("Room already exists","Sorry we already have a name with that Room",[{ text: 'OK', onPress: () => console.log('OK Pressed') }])
         }
         else{
-        const newRoom = { id: rooms.length + 1, name: newRoomName.trim() ,imageUri:image};
-        let updatedRooms = [...rooms.filter(room => room.id !== 7), newRoom]; // Exclude room with ID 7, then add the new room
-        updatedRooms.push(rooms.find(room => room.id === 7)); // Add the room with ID 7 (Add New Room option) to the end
-        setRooms(updatedRooms)
+        const newRoom = { id: rooms.length + 1, roomDisplayName: newRoomName.trim() ,imageUri:image,roomType:selectedRoomType};
+        console.log("newRoom",newRoom)
+
+        const data={
+            email:user.emailAddresses[0].emailAddress,
+            room:{
+                imageUri:newRoom.imageUri,
+                roomDisplayName:newRoom.roomDisplayName,
+                roomType:newRoom.roomType,
+                addedBy:user.emailAddresses[0].emailAddress
+            }
+        }
+
+        console.log("data to go to room adding API",data)
+        GlobalApi.addUserInitialNewRooms(data).then(async(resp)=>{
+            console.log("response for adding new room",resp);
+        })
+
+          setRooms([...rooms,newRoom])
+
+        console.log("new Rooms",rooms)
         setNewRoomName('');
-        setImage(null)
+        setImage(null);
+        setSelectedRoomType(null);
         }
     }
     setIsAddingNewRoom(false);
 };
+
+const handleAddNewRoom=()=>{
+    setIsAddingNewRoom(true);
+
+}
 
 const handleNavigateToStorageTypes = () => {
     // Implement navigation logic to navigate to the screen/modal where users can choose storage types
@@ -252,14 +246,19 @@ const handleNavigateToStorageTypes = () => {
                             ]}
                             onPress={() => toggleRoomSelection(room)}
                         >
-                            <Text style={styles.roomName}>{room.name}</Text>
+                            <Text style={styles.roomName}>{room.roomDisplayName}</Text>
                         </TouchableOpacity>
                     ))}
+                    <TouchableOpacity onPress={handleAddNewRoom} style={styles.roomItem}>
+                        <View style={styles.addButton}>
+                            <Text style={styles.roomName}>+ Add New Room</Text>
+                        </View>
+                    </TouchableOpacity>
                 </View>
                 </View>
                 
             </View>
-        <RoomForm handleAddRoom={handleAddRoom} isAddingNewRoom={isAddingNewRoom} newRoomName={newRoomName} setIsAddingNewRoom={setIsAddingNewRoom} setNewRoomName={setNewRoomName} image={image} setImage={setImage}/>
+        <RoomForm selectedRoomType={selectedRoomType} setSelectedRoomType={setSelectedRoomType} handleAddRoom={handleAddRoom} isAddingNewRoom={isAddingNewRoom} newRoomName={newRoomName} setIsAddingNewRoom={setIsAddingNewRoom} setNewRoomName={setNewRoomName} image={image} setImage={setImage}/>
        <View style={{paddingBottom:20,paddingTop:20}}>
        <TouchableOpacity style={styles.nextButton} onPress={handleNavigateToStorageTypes}>
                 {selectedRooms.length!=0?(<Text style={styles.nextButtonText}>Next: Choose Storage Types</Text>):(<Text style={styles.nextButtonText}>Skip</Text>)}

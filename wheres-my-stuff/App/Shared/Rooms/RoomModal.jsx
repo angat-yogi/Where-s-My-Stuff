@@ -20,7 +20,7 @@ useEffect(()=>{
         try{
         GlobalApi.getDefaultFurnitures().then(async (resp) => {
             const nullRoomFurnitures = resp.furnitures.filter(item => item.email === 'admin@wms.com'||item.email === user.emailAddresses[0].emailAddress);
-            const matchingRoomFurnitures = resp.furnitures.filter(item => item.room && item.room.toLowerCase() === data.name.toLowerCase());
+            const matchingRoomFurnitures = resp.furnitures.filter(item => item.room && item.room.toLowerCase() === data.roomDisplayName.toLowerCase());
             const filteredFurnitures = Array.from(new Set([...nullRoomFurnitures, ...matchingRoomFurnitures]));
             
             setAllFurnitures(resp.furnitures)
@@ -124,7 +124,7 @@ useEffect(()=>{
         >
             <View style={styles.modalContainer}>
                 <KeyboardAvoidingView style={[styles.modalContent, { width: windowWidth * 0.9, height: windowHeight * 0.8 }]} behavior="padding">
-                    <Text style={styles.modalTitle}>{data.name}</Text>
+                    <Text style={styles.modalTitle}>{data.roomDisplayName}</Text>
                     {data.imageUri && <Image source={{ uri: data.imageUri }} style={styles.selectedImage} />}
                     <Text style={styles.modalDescription}>This is where you can customize your living room storage options.</Text>
                     

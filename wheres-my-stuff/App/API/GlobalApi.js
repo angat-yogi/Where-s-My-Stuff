@@ -176,8 +176,83 @@ try {
 return result;
 };
 
+//UserRooms
 
 
+const addUserInitialOldRooms = async (data) => {
+  let result;
+
+  const mutationQuery = gql`
+  mutation AddUserNewRooms {
+    createUserRoom(
+      data: {
+        userEmail: "${data.email}", 
+        rooms: {
+          connect: {
+            roomDisplayName: "${data.room.roomDisplayName}", 
+      }
+    }
+  }
+    ) {
+      id
+    }
+    publishManyUserRooms{
+      count
+    }
+  }
+  
+  `;
+  console.log("mutationQuery",mutationQuery)
+try {
+  result = await request(URL, mutationQuery);
+} catch (error) {
+  console.log("error on api:", error);
+
+}
+return result;
+};
+
+const addUserInitialNewRooms = async (data) => {
+
+  let result;
+
+  const mutationQuery = gql`
+  mutation AddUserNewRooms {
+    createUserRoom(
+      data: {
+        userEmail: "${data.email}", 
+        rooms: {
+          create: {
+            imageUri: "${data.room.imageUri}", 
+            roomDisplayName: "${data.room.roomDisplayName}", 
+            roomType: ${data.room.roomType.trim('"')}, 
+            addedBy: "${data.email}"
+      }
+    }
+  }
+    ) {
+      id
+    }
+    publishManyRooms{
+      count
+    }
+    publishManyUserRooms{
+      count
+    }
+  }
+  
+  `;
+  console.log("mutationQuery",mutationQuery)
+try {
+  result = await request(URL, mutationQuery);
+} catch (error) {
+  console.log("error on api:", error);
+
+}
+return result;
+};
+
+//UserFurnituresByRoom
 const addUserInitialOldFurnitures = async (data) => {
   let result;
 
@@ -318,6 +393,7 @@ const getDefaultRooms = async () => {
       imageUri
       roomDisplayName
       roomType
+      addedBy
     }
   }
   
@@ -410,5 +486,7 @@ export default {
   publishFurnitures,
   publishUserFurnitures,
   addUserInitialNewFurnitures,
-  getDefaultRooms
+  getDefaultRooms,
+  addUserInitialOldRooms,
+  addUserInitialNewRooms
 };

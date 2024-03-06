@@ -5,12 +5,14 @@ import { FontAwesome } from '@expo/vector-icons';
 import { EvilIcons } from '@expo/vector-icons';
 import * as ImagePicker from "expo-image-picker";
 import Colors from '../../../Utils/Colors';
-const RoomForm =({image,isAddingNewRoom,setNewRoomName,setIsAddingNewRoom,handleAddRoom,newRoomName,setImage}) => {
-    const [isFormComplete, setIsFormComplete] = useState(false);
+import { SelectList } from 'react-native-dropdown-select-list'
+import RoomType from '../../../Utils/Enums';
 
+const RoomForm =({image,selectedRoomType,setSelectedRoomType,isAddingNewRoom,setNewRoomName,setIsAddingNewRoom,handleAddRoom,newRoomName,setImage}) => {
+    const [isFormComplete, setIsFormComplete] = useState(false);
     useEffect(() => {
-        setIsFormComplete(newRoomName.trim() !== '' && image !== null);
-    }, [newRoomName, image]);
+        setIsFormComplete(newRoomName.trim() !== '' && image !== null&&selectedRoomType!==null);
+    }, [newRoomName, image,selectedRoomType]);
     
     const pickImages = async () => {
         setImage(null);
@@ -76,7 +78,22 @@ const RoomForm =({image,isAddingNewRoom,setNewRoomName,setIsAddingNewRoom,handle
                             placeholder="Enter room name"
                             value={newRoomName}
                             onChangeText={(text) => setNewRoomName(text)}
-                        />                    
+                        />   
+                        <View style={styles.selectListContainer}>
+                        <SelectList 
+                            setSelected={(val) => setSelectedRoomType(val)} 
+                            containerStyle={styles.selectList}
+                            textStyle={styles.selectListText}
+                            itemStyle={styles.selectListItem}
+                            selectedItemStyle={styles.selectListItemSelected}
+                            data={Object.values(RoomType)} // Pass array of enum values to SelectList
+                            save="value"
+                            placeholder="Select Room Type"
+                            defaultOption="Other"
+                            search={false}
+                        /> 
+                        </View>
+                                        
                         <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-around",paddingBottom:20}}>
                             <TouchableOpacity onPress={takePicture}>
                             <EvilIcons name="camera" size={30} color={Colors.BEIGE} style={{ marginHorizontal: 10 }}/>
@@ -102,6 +119,32 @@ const RoomForm =({image,isAddingNewRoom,setNewRoomName,setIsAddingNewRoom,handle
 export default RoomForm;
 
 const styles = StyleSheet.create({
+    selectListContainer: {
+        width: '80%',
+        marginBottom: 20,
+        paddingHorizontal: 10,
+        paddingBottom:10,
+        paddingVertical: 8,
+    },
+    selectList: {
+        width: '80%',
+        borderWidth: 1,
+        borderColor: '#ccc',
+        borderRadius: 10,
+        marginBottom: 20,
+        paddingHorizontal: 10,
+        paddingBottom:10,
+        paddingVertical: 8,
+    },
+    selectListText: {
+        fontSize: 16,
+    },
+    selectListItem: {
+        paddingVertical: 8,
+    },
+    selectListItemSelected: {
+        backgroundColor: 'red',
+    },
     roomName: {
         fontSize: 16,
     },

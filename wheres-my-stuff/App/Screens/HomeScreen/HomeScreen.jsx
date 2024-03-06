@@ -3,11 +3,32 @@ import React, { useEffect, useState } from "react";
 import Header from "./Header";
 import Slider from "./Slider";
 import GlobalApi from "../../API/GlobalApi";
+import { useUser } from "@clerk/clerk-expo";
 
 export default function HomeScreen() {
   const [categories, setCategories] = useState();
   const [fashions, setFashions] = useState();
   const [storageTypes, setStorageTypes] = useState();
+  const [rooms,setRooms]=useState([]);
+
+  const { user, isLoading } = useUser();
+
+const getRooms = () => {
+  try{
+  GlobalApi.getDefaultRooms().then(async (resp) => {
+      const customizedRoomsForUser=resp.rooms.filter(r=>r.addedBy==='admin@wms.com'||r.addedBy===user?.emailAddresses[0].emailAddress)
+      setRooms(customizedRoomsForUser)
+      console.log("resp",resp.rooms)
+  })
+  }
+  catch(error){
+      console.error("Error fetching default furnitures:", error);
+  };
+
+  console.log("Api called",rooms)
+
+};
+
   const getCategories = () => {
     GlobalApi.getCategories().then((resp) => {
       setCategories(resp?.categories);
@@ -46,6 +67,7 @@ export default function HomeScreen() {
     }
   };
   useEffect(() => {
+    getRooms();
     getCategories();
     getTrendingFashions();
     getStorageTypes();
@@ -74,7 +96,7 @@ export default function HomeScreen() {
           // isViewAll={false}
           plus={true}
           heading="Rooms"
-          data={storageTypes}
+          data={rooms}
           styleImage={styles.imageFashion}
         />
       </View>

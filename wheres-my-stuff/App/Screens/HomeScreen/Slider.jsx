@@ -15,15 +15,15 @@ import React, { useEffect, useState } from "react";
 import Heading from "../../Shared/Heading";
 
 export default function Slider({ data, heading, isViewAll,plus, styleImage,displayHeading}) {
+  console.log(data)
   const navigation = useNavigation();
-  const handlePress = (action) => {
-    if(action!=null){
-      navigation.navigate(action); 
-    }
-    else{
+  const handlePress = (item, action) => {
+    if (action != null&& item) {
+      navigation.navigate(action,{selectedItem:item})    } else {
       return;
     }
   };
+
   return (
     <View>
       <View style={styles.categories}>
@@ -44,8 +44,7 @@ export default function Slider({ data, heading, isViewAll,plus, styleImage,displ
           <TouchableOpacity onPress={() => handlePress("Camera")}>
             <FontAwesome name="plus" size={24} color="black" />
           </TouchableOpacity>
-  </>
-            
+  </>        
         )}
         </View>
         
@@ -55,18 +54,17 @@ export default function Slider({ data, heading, isViewAll,plus, styleImage,displ
           showsHorizontalScrollIndicator={false}
           renderItem={({ item, index }) => (
             <TouchableOpacity
-              onPress={() =>
-                handlePress('room')
-              }
+            onPress={() => handlePress(item,'room')}
               style={{ marginRight: 20, alignItems: "center" }}
             >
               <Text style={styles.categoryName}>
-                {item.name || item.storageTypeName}
+                {item.name || item.storageTypeName||item.roomDisplayName}
               </Text>
               <Image
                 style={styleImage}
                 source={{
                   uri:
+                  item.imageUri||
                     item?.displayImage?.url ||
                     item.image[0]?.url ||
                     item.image.url ||
