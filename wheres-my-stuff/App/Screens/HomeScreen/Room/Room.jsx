@@ -4,6 +4,7 @@ import GlobalApi from '../../../API/GlobalApi';
 import Heading from '../../../Shared/Heading';
 import Header from '../Header';
 import { useUser } from '@clerk/clerk-expo';
+import { useNavigation } from '@react-navigation/native';
 const { width } = Dimensions.get('window');
 const imageWidth = width / 2;
 const Room = ({ route }) => {
@@ -12,17 +13,44 @@ const Room = ({ route }) => {
    console.log(route)
     const getFurnitures = () => {
         try {
-            GlobalApi.getDefaultFurnitures().then(async (resp) => {
-                console.log(resp)
-                const allDeafultRoomFurnitures = resp.furnitures.filter(item => item.email === 'admin@wms.com' );
-                const allUserAddedRoomFurnitures = resp.furnitures.filter(item => item.email === user.emailAddresses[0].emailAddress || item.room?.toLowerCase()===route.params.selectedItem.roomDisplayName.toLowerCase() );
-                const filteredFurnitures = Array.from(new Set([...allDeafultRoomFurnitures, ...allUserAddedRoomFurnitures]));
+            GlobalApi.getUserFurnitures().then(async (resp) => {
+                console.log("new api",resp)
+                console.log("furnitures",resp)
+
+                const filteredFurnitures = [];
+                const addedFurnitureIds = []; // Array to store the IDs of furniture items already added
+
+                resp.userFurnitures.forEach(userFurniture => {
+                    userFurniture.furnitures?.forEach(furniture => {
+                        // Check if the furniture meets the criteria and has not been added before
+                        if ((userFurniture.userEmail === user.emailAddresses[0].emailAddress &&
+                                userFurniture.room?.toLowerCase().replace(/\s/g, '') === route.params.selectedItem.roomType.toLowerCase())
+                        ) {
+                            // Check if the furniture ID is not already in the addedFurnitureIds array
+                            if (!addedFurnitureIds.includes(furniture.id)) {
+                                // Add the furniture to the filtered list
+                                filteredFurnitures.push(furniture);
+                                // Add the furniture ID to the addedFurnitureIds array
+                                addedFurnitureIds.push(furniture.id);
+                            }
+                        }
+                    });
+                });
 
                 setUserFurnitures(filteredFurnitures);
-            })
+                 console.log(filteredFurnitures)
+            });
         } catch (error) {
             console.error("Error fetching default furnitures:", error);
         };
+    };
+
+    const navigation = useNavigation();
+    const goToFurniture = (item) => {
+      if (item) {
+        navigation.navigate('furniture',{selectedItem:item})    } else {
+        return;
+      }
     };
 
 
@@ -45,7 +73,7 @@ const Room = ({ route }) => {
                   renderItem={({ item }) => (
                     <View>
                       {item.image.map((image, index) => (
-                                  <TouchableOpacity key={index} style={styles.imageContainer}>
+                                  <TouchableOpacity key={index} style={styles.imageContainer} onPress={()=>goToFurniture(item)}>
                                       <Image
                                           source={{ uri: image }}
                                           style={styles.image}
@@ -69,24 +97,24 @@ const styles = StyleSheet.create({
       flexDirection: 'column',
     },
     imageContainer: {
-      width: imageWidth*0.95,
+      width: imageWidth,
       height: imageWidth,
-      margin: 5,
       justifyContent: 'center',
       alignItems: 'center',
-      padding:15
+      padding:5
 
     },
     image: {
       width: '100%',
       height: '100%',
       resizeMode: 'cover',
+      borderRadius:20
     },
     imageName: {
         textAlign: 'center',
         fontWeight: 'bold',
         fontSize: 18,
-        marginTop: -12, // Adjust this value to reduce the distance between the image and its name
+        // marginTop: -12, // Adjust this value to reduce the distance between the image and its name
     },
   });
   
