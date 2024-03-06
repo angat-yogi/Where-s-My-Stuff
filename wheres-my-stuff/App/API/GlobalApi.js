@@ -362,6 +362,32 @@ try {
 return result;
 };
 
+const getUserFurnitures = async () => {
+  let result;
+  const query = gql`
+  query GetUserFurnitures {
+    userFurnitures(last:100) {
+      userEmail
+      room
+      furnitures(last: 100) {
+        email
+        image
+        name
+        id
+        room
+      }
+    }
+  }
+  
+  `;
+  try {
+    result = await graphQLClient.request(query);
+  } catch (error) {
+    console.log("error on api:", error);
+  }
+  return result;
+};
+
 const getDefaultFurnitures = async () => {
   let result;
   const query = gql`
@@ -488,5 +514,6 @@ export default {
   addUserInitialNewFurnitures,
   getDefaultRooms,
   addUserInitialOldRooms,
-  addUserInitialNewRooms
+  addUserInitialNewRooms,
+  getUserFurnitures
 };

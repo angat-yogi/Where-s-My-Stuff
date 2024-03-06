@@ -14,29 +14,75 @@ const RoomModal = ({ modalVisible, data, onNext, setModalVisible, onClose,onPrev
     const [openCameraModal,setOpenCameraModal]=useState(false)
     const [imageUri,setImageUri]=useState(null)
     const [allFurnitures, setAllFurnitures] = useState([]);
+    const [allFurnituresForUser, setAllFurnituresForUser] = useState([]);
+    const [nextPrevClicked,setNextPrevClicked]=useState(false)
 
+    console.log("Room modal opened",data)
 useEffect(()=>{
     const getFurnitures = () => {
-        try{
-        GlobalApi.getDefaultFurnitures().then(async (resp) => {
-            const nullRoomFurnitures = resp.furnitures.filter(item => item.email === 'admin@wms.com'||item.email === user.emailAddresses[0].emailAddress);
-            const matchingRoomFurnitures = resp.furnitures.filter(item => item.room && item.room.toLowerCase() === data.roomDisplayName.toLowerCase());
-            const filteredFurnitures = Array.from(new Set([...nullRoomFurnitures, ...matchingRoomFurnitures]));
-            
-            setAllFurnitures(resp.furnitures)
-            setFurnitures(filteredFurnitures);
-            setLoading(false)
-        })
-        }
-        catch(error){
+        try {
+            GlobalApi.getUserFurnitures().then(async (resp) => {
+                console.log("new api",resp)
+                console.log("furnitures",resp)
+
+                const filteredFurnitures = [];
+                const addedFurnitureIds = []; // Array to store the IDs of furniture items already added
+
+                resp.userFurnitures.forEach(userFurniture => {
+                    userFurniture.furnitures?.forEach(furniture => {
+                        // Check if the furniture meets the criteria and has not been added before
+                        if (
+                            (furniture.email === 'admin@wms.com' && !furniture.room) ||
+                            (userFurniture.userEmail === user.emailAddresses[0].emailAddress &&
+                                userFurniture.room?.toLowerCase().replace(/\s/g, '') === data.roomType.toLowerCase())
+                        ) {
+                            // Check if the furniture ID is not already in the addedFurnitureIds array
+                            if (!addedFurnitureIds.includes(furniture.id)) {
+                                // Add the furniture to the filtered list
+                                filteredFurnitures.push(furniture);
+                                // Add the furniture ID to the addedFurnitureIds array
+                                addedFurnitureIds.push(furniture.id);
+                            }
+                        }
+                    });
+                });
+
+                 setFurnitures(filteredFurnitures);
+                 console.log(filteredFurnitures)
+                setLoading(false);
+            });
+
+            GlobalApi.getDefaultFurnitures().then(async (resp) => {
+                setAllFurnitures(resp.furnitures)
+                const filteredUserFurnitures = [];
+
+                resp.furnitures.forEach(f => {
+                    if (f.email === 'admin@wms.com' || f.email.toLowerCase() === user.emailAddresses[0].emailAddress.toLowerCase()) {
+                        // Include the furniture item in the filteredUserFurnitures array
+                        filteredUserFurnitures.push(f);
+                        if (f.room && f.room.toLowerCase() !== data.roomType.toLowerCase()) {
+                            // If the furniture has a room specified and it's not the desired room, remove it from filteredUserFurnitures
+                            const indexToRemove = filteredUserFurnitures.findIndex(item => item.id === f.id);
+                            if (indexToRemove !== -1) {
+                                filteredUserFurnitures.splice(indexToRemove, 1);
+                            }
+                        }
+                    }
+                });
+                
+
+                setAllFurnituresForUser(filteredUserFurnitures)
+                console.log("allFurnituresForUser",allFurnituresForUser)
+                console.log("all furnitures",allFurnitures)
+            });
+                 
+        } catch (error) {
             console.error("Error fetching default furnitures:", error);
         };
-
-        console.log("Api called",furnitures)
-
     };
+    
     getFurnitures();
-},[data.name])
+},[data.roomType,nextPrevClicked])
 
     
     const [furnitures, setFurnitures] = useState([]);
@@ -61,15 +107,16 @@ useEffect(()=>{
     const prevClicked=()=>{
         setSelectedFurnitures([]);
         onPrev();
+        setNextPrevClicked(true);
         setShowAddFurnitureForm(false)
 
     }
 
     const nextClicked=()=>{
         data.furnitures=selectedFurnitures;
-        setSelectedFurnitures([]);
-
+        setSelectedFurnitures([])
         onNext()
+        setNextPrevClicked(true)
         setShowAddFurnitureForm(false)
 
     }
@@ -129,7 +176,7 @@ useEffect(()=>{
                     <Text style={styles.modalDescription}>This is where you can customize your living room storage options.</Text>
                     
                     <ScrollView horizontal={true}  showsHorizontalScrollIndicator={false} contentContainerStyle={styles.furnitureOptionsContainer}>
-                    {furnitures.map((furniture) => (
+                    {allFurnituresForUser.map((furniture) => (
                     <TouchableOpacity key={furniture.id} onPress={() => toggleFurnitureSelection(furniture)}>
                         <View style={[styles.furnitureOption, selectedFurnitures.some((item) => item.id === furniture.id) && styles.selectedFurnitureOption]}>
                             {furniture.image?.length > 0 && <Image source={{ uri:  furniture.image[0] }} style={styles.furnitureImage} />}
