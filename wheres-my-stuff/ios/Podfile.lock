@@ -10,6 +10,11 @@ PODS:
   - EXImageLoader (4.6.0):
     - ExpoModulesCore
     - React-Core
+  - EXMediaLibrary (15.9.1):
+    - ExpoModulesCore
+    - glog
+    - RCT-Folly (= 2022.05.16.00)
+    - React-Core
   - Expo (50.0.7):
     - ExpoModulesCore
   - ExpoCamera (13.9.0):
@@ -1060,8 +1065,6 @@ PODS:
     - React-jsi (= 0.73.4)
     - React-logger (= 0.73.4)
     - React-perflogger (= 0.73.4)
-  - RNDateTimePicker (7.6.1):
-    - React-Core
   - RNGestureHandler (2.14.1):
     - glog
     - RCT-Folly (= 2022.05.16.00)
@@ -1106,6 +1109,7 @@ DEPENDENCIES:
   - EXConstants (from `../node_modules/expo-constants/ios`)
   - EXFont (from `../node_modules/expo-font/ios`)
   - EXImageLoader (from `../node_modules/expo-image-loader/ios`)
+  - EXMediaLibrary (from `../node_modules/expo-media-library/ios`)
   - Expo (from `../node_modules/expo`)
   - ExpoCamera (from `../node_modules/expo-camera/ios`)
   - ExpoCrypto (from `../node_modules/expo-crypto/ios`)
@@ -1165,7 +1169,6 @@ DEPENDENCIES:
   - React-runtimescheduler (from `../node_modules/react-native/ReactCommon/react/renderer/runtimescheduler`)
   - React-utils (from `../node_modules/react-native/ReactCommon/react/utils`)
   - ReactCommon/turbomodule/core (from `../node_modules/react-native/ReactCommon`)
-  - "RNDateTimePicker (from `../node_modules/@react-native-community/datetimepicker`)"
   - RNGestureHandler (from `../node_modules/react-native-gesture-handler`)
   - RNImageCropPicker (from `../node_modules/react-native-image-crop-picker`)
   - RNReanimated (from `../node_modules/react-native-reanimated`)
@@ -1194,6 +1197,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/expo-font/ios"
   EXImageLoader:
     :path: "../node_modules/expo-image-loader/ios"
+  EXMediaLibrary:
+    :path: "../node_modules/expo-media-library/ios"
   Expo:
     :path: "../node_modules/expo"
   ExpoCamera:
@@ -1308,8 +1313,6 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon/react/utils"
   ReactCommon:
     :path: "../node_modules/react-native/ReactCommon"
-  RNDateTimePicker:
-    :path: "../node_modules/@react-native-community/datetimepicker"
   RNGestureHandler:
     :path: "../node_modules/react-native-gesture-handler"
   RNImageCropPicker:
@@ -1332,6 +1335,7 @@ SPEC CHECKSUMS:
   EXConstants: 988aa430ca0f76b43cd46b66e7fae3287f9cc2fc
   EXFont: f20669cb266ef48b004f1eb1f2b20db96cd1df9f
   EXImageLoader: 55080616b2fe9da19ef8c7f706afd9814e279b6b
+  EXMediaLibrary: 5a74f7d9cce776ca07cb3090b948cedd7d4841a1
   Expo: 1cf3922a9b26262b2556544d4defcecccd37d033
   ExpoCamera: c13580cc0964c9e462f76579a0de9f468a9c6e73
   ExpoCrypto: b6428f48599c007676dc81a9b5f72c07e62fdccc
@@ -1390,7 +1394,6 @@ SPEC CHECKSUMS:
   React-runtimescheduler: 96c8bfa2ea02443b79cd9359afb91dfd1bf3b958
   React-utils: 6e5ad394416482ae21831050928ae27348f83487
   ReactCommon: 5fd44dbef85dfbafc87facae700c66d2da71b2cb
-  RNDateTimePicker: 8fb39263b721223e095248acaf6f406d5b7f6713
   RNGestureHandler: 25b969a1ffc806b9f9ad2e170d4a3b049c6af85e
   RNImageCropPicker: e7ab6fb43d2fc3e84651e786ef4a080d63b0ed3d
   RNReanimated: 6259d9f32f4a54b2f5660bc2c1829215e38ca20f

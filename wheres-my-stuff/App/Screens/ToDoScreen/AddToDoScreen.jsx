@@ -9,7 +9,6 @@ import {
 } from "react-native";
 import { Formik } from "formik";
 import React, { useState } from "react";
-import DateTimePicker from "@react-native-community/datetimepicker";
 import { useUser } from "@clerk/clerk-expo";
 import GlobalApi from "../../API/GlobalApi";
 

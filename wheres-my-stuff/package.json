@@ -11,7 +11,6 @@
     "@clerk/clerk-expo": "^0.20.5",
     "@expo/config": "^8.1.1",
     "@expo/metro-config": "^0.10.0",
-    "@react-native-community/datetimepicker": "7.6.1",
     "@react-native-community/slider": "^4.5.0",
     "@react-navigation/bottom-tabs": "^6.5.12",
     "@react-navigation/drawer": "^6.6.7",
