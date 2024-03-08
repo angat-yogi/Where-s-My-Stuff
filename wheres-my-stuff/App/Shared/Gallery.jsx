@@ -19,7 +19,6 @@ export default function Gallery({ onImagesSelected,viewGallery }) {
       allowsMultipleSelection: true,
     });
 
-    console.log(result);
 
     if (!result.canceled) {
       const selectedImages = result.assets.map((asset) => asset.uri);

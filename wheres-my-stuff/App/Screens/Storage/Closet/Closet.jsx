@@ -29,7 +29,6 @@ export default function Closet() {
 
   const handleImagesSelected = (selectedImages) => {
     setClosetImages(selectedImages);
-    console.log(closetImages);
   };
 
   const getClosetsContents = () => {
@@ -95,7 +94,6 @@ const panResponders = storageContents.map((_, index) => {
       onStartShouldSetPanResponder: () => true,
       onPanResponderMove: (event, gesture) => {
         // Log the position of the dragged image
-        console.log(`Image ${index} Position: x=${gesture.dx}, y=${gesture.dy}`);
         imageCoordinates[storageContents[index]] = { x: gesture.dx, y: gesture.dy };
         Animated.event(
           [null, { dx: imagePositions[index].x, dy: imagePositions[index].y }],
@@ -109,10 +107,7 @@ const panResponders = storageContents.map((_, index) => {
 });
 
 const updateImagePositions = (coordinatesData) => {
-  console.log("imagePositions",imagePositions)
   const updatedPositions = [...imagePositions];
-  console.log("I am here")
-console.log("updatedPositions",updatedPositions)
   coordinatesData.forEach((coordinate) => {
     const { imageUri, xCoordinate, yCoordinate } = coordinate;
     const index = storageContents.findIndex((uri) => uri === imageUri);
@@ -120,7 +115,6 @@ console.log("updatedPositions",updatedPositions)
       updatedPositions[index] = new Animated.ValueXY({ x: xCoordinate, y: yCoordinate });
     }
   });
-  console.log("updatedPositions",updatedPositions)
 
   setImagePositions(updatedPositions);
 };
@@ -129,7 +123,6 @@ const getImagesCordinatesFromAPI=()=>{
   getClosetsContents();
   getStorageTypes();
 GlobalApi.getItemsStorageCoordinates().then((resp)=>{
-  console.log("I am here",resp)
 
   if (resp?.userStorageItemCoordinates) {
     updateImagePositions(resp.userStorageItemCoordinates);
@@ -146,41 +139,32 @@ const handleApiCall = () => {
       X: coordinates.x,
       Y: coordinates.y,
     };
-    console.log("data", data);
     GlobalApi.addItemCoordinates(data).then(async (resp) => {
-      console.log(resp);
     });
   });
 };
 
   const saveImagesToDb=async()=>{
-    console.log(imageCoordinates)
     if(storageContents.length>0){
       const data = {
         userId: user?.emailAddresses[0]?.emailAddress,
         imageUrl:closetImages
       };
-    console.log(imagePositions)
-      console.log("data",data);
       if(data.imageUrl.length>0){
         GlobalApi.addclosetContents(data).then(async(resp) => {
-          console.log(resp);
           // Save images to gallery
           for (const uri of closetImages) {
             const asset = await MediaLibrary.createAssetAsync(uri);
             const assetUri = await MediaLibrary.getAssetInfoAsync(asset);
-            console.log("Asset URI:", assetUri.uri);
           }
         });
       }
       else {
-        console.log("No images to save in data");
         navigation.navigate("home");
 
       }
       
     } else {
-      console.log("No images to save in storage");
       navigation.navigate("home");
 
     }

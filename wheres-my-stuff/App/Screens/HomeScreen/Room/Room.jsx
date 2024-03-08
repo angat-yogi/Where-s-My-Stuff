@@ -14,8 +14,6 @@ const Room = ({ route }) => {
     const getFurnitures = () => {
         try {
             GlobalApi.getUserFurnitures().then(async (resp) => {
-                console.log("new api",resp)
-                console.log("furnitures",resp)
 
                 const filteredFurnitures = [];
                 const addedFurnitureIds = []; // Array to store the IDs of furniture items already added
@@ -38,7 +36,6 @@ const Room = ({ route }) => {
                 });
 
                 setUserFurnitures(filteredFurnitures);
-                 console.log(filteredFurnitures)
             });
         } catch (error) {
             console.error("Error fetching default furnitures:", error);

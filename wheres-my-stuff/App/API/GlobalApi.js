@@ -103,7 +103,6 @@ const addclosetContents = async (data) => {
     }
   }
   `;
-  console.log("mutationQuery",mutationQuery)
 try {
   result = await request(URL, mutationQuery);
   Alert.alert('Success', 'Successfull, Closing the closet', [{ text: 'OK', onPress: () => console.log('OK Pressed') }]);
@@ -133,7 +132,6 @@ const addUserRoom = async (data) => {
   }
 
   `;
-  console.log("mutationQuery",mutationQuery)
 try {
   result = await request(URL, mutationQuery);
   Alert.alert('Success', 'Successfully organized closet', [{ text: 'OK', onPress: () => console.log('OK Pressed') }]);
@@ -164,7 +162,6 @@ const addItemCoordinates = async (data) => {
     }
   }
   `;
-  console.log("mutationQuery",mutationQuery)
 try {
   result = await request(URL, mutationQuery);
   Alert.alert('Success', 'Successfully organized closet', [{ text: 'OK', onPress: () => console.log('OK Pressed') }]);
@@ -202,7 +199,6 @@ const addUserInitialOldRooms = async (data) => {
   }
   
   `;
-  console.log("mutationQuery",mutationQuery)
 try {
   result = await request(URL, mutationQuery);
 } catch (error) {
@@ -242,7 +238,6 @@ const addUserInitialNewRooms = async (data) => {
   }
   
   `;
-  console.log("mutationQuery",mutationQuery)
 try {
   result = await request(URL, mutationQuery);
 } catch (error) {
@@ -271,9 +266,40 @@ const addUserInitialOldFurnitures = async (data) => {
   }
   
   `;
-  console.log("mutationQuery",mutationQuery)
 try {
   result = await request(URL, mutationQuery);
+} catch (error) {
+  console.log("error on api:", error);
+
+}
+return result;
+};
+
+
+const addFurniture =async (data)=>{
+  let result;
+
+  const mutationQuery = gql`
+  mutation AddNewFurniture {
+    createFurniture(data: 
+      {
+        name: "${data.name}", 
+        image: "${data.image}",
+        email:"${data.email}"
+      })
+    {
+      
+  id
+    }
+    publishManyFurnitures{
+      count
+    }
+  }
+  `;
+  console.log("adding new furnitures API Query",mutationQuery)
+try {
+  result = await request(URL, mutationQuery);
+  console.log("result for adding furnitures",result)
 } catch (error) {
   console.log("error on api:", error);
 
@@ -328,9 +354,7 @@ const publishUserFurnitures = async () => {
   console.log("mutationQuery",mutationQuery)
 try {
   result = await request(URL, mutationQuery);
-  console.log(result)
   if(result.publishManyUserFurnitures.count>0){
-    console.log(result)
   }
 } catch (error) {
   console.log("error on api:", error);
@@ -349,12 +373,9 @@ const publishFurnitures = async () => {
     }
   }
   `;
-  console.log("mutationQuery",mutationQuery)
 try {
   result = await request(URL, mutationQuery);
-  console.log(result)
   if(result.publishManyFurnitures.count>0){
-    console.log(result)
   }
 } catch (error) {
   console.log("error on api:", error);
@@ -490,7 +511,6 @@ const getItemsStorageCoordinates = async () => {
   `;
   try {
     result = await graphQLClient.request(query);
-    console.log("coordinates",result)
   } catch (error) {
     console.log("error on api:", error);
   }
@@ -515,5 +535,6 @@ export default {
   getDefaultRooms,
   addUserInitialOldRooms,
   addUserInitialNewRooms,
-  getUserFurnitures
+  getUserFurnitures,
+  addFurniture
 };

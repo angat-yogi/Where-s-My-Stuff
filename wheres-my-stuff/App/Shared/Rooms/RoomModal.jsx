@@ -5,6 +5,7 @@ import { FontAwesome6 } from '@expo/vector-icons';
 import { Ionicons } from '@expo/vector-icons';
 import { AntDesign } from '@expo/vector-icons';
 import GlobalApi from '../../API/GlobalApi';
+import ImageAPI from '../../API/ImageAPI';
 import ImageOrCamera from '../ImageOrCamera';
 import { useUser } from '@clerk/clerk-expo';
 
@@ -15,15 +16,14 @@ const RoomModal = ({ modalVisible, data, onNext, setModalVisible, onClose,onPrev
     const [imageUri,setImageUri]=useState(null)
     const [allFurnitures, setAllFurnitures] = useState([]);
     const [allFurnituresForUser, setAllFurnituresForUser] = useState([]);
-    const [nextPrevClicked,setNextPrevClicked]=useState(false)
+    const [nextPrevClicked,setNextPrevClicked]=useState(null)
+    const [newFurnitureTracking,setNewFurnitureTracking]=useState(false);
+    const [isNewFurnitureLoading,setIsNewFurnitureLoading]=useState(false);
+    let imageChangeTracker='';
 
-    console.log("Room modal opened",data)
-useEffect(()=>{
     const getFurnitures = () => {
         try {
             GlobalApi.getUserFurnitures().then(async (resp) => {
-                console.log("new api",resp)
-                console.log("furnitures",resp)
 
                 const filteredFurnitures = [];
                 const addedFurnitureIds = []; // Array to store the IDs of furniture items already added
@@ -69,20 +69,18 @@ useEffect(()=>{
                         }
                     }
                 });
-                
-
                 setAllFurnituresForUser(filteredUserFurnitures)
-                console.log("allFurnituresForUser",allFurnituresForUser)
-                console.log("all furnitures",allFurnitures)
             });
                  
         } catch (error) {
             console.error("Error fetching default furnitures:", error);
         };
     };
-    
+
+useEffect(()=>{
+   
     getFurnitures();
-},[data.roomType,nextPrevClicked])
+},[data.roomType,nextPrevClicked,allFurnituresForUser.length])
 
     
     const [furnitures, setFurnitures] = useState([]);
@@ -101,7 +99,6 @@ useEffect(()=>{
         } else {
             setSelectedFurnitures([...selectedFurnitures, furniture]);
         }
-        console.log("selectedFurnitures",selectedFurnitures)
     };
 
     const prevClicked=()=>{
@@ -126,7 +123,7 @@ useEffect(()=>{
         setShowAddFurnitureForm(true);
     };
 
-    const handleSubmitNewFurniture = () => {
+    const handleSubmitNewFurniture = async () => {
         // Add the new furniture to the list
         if(newFurnitureName.trim()===''||newFurnitureName==null||imageUri===null){
             Alert.alert("Invalid Name","Furniture name  or Image can not be empty");
@@ -137,14 +134,44 @@ useEffect(()=>{
             Alert.alert("Duplicate Name", "A furniture with the same name already exists");
             return;
         }
+        
         const newFurniture = { id: allFurnitures.length + 1, name: newFurnitureName,image:[imageUri] };
+        setIsNewFurnitureLoading(true);
+
+        const imageFile = {
+            uri: imageUri,
+            type: 'image/jpeg', // adjust the type based on the image format
+            name: `${user.firstName}${newFurniture.name.trim().toLowerCase()}${data.roomType.toLowerCase().trim()}${Date.now().toString()}.jpg`, // you can use any name for the file
+        };
+
+        const imageFromCamera = await ImageAPI.uploadImageAPI(imageFile);
+        let furnitureToAPI={
+            name:newFurniture.name,
+            email:user.emailAddresses[0].emailAddress,
+            image:imageFromCamera.url
+        }
+        
+        newFurniture.image=[imageFromCamera.url]
+        setIsNewFurnitureLoading(false);
+
         console.log("adding new furniture",newFurniture)
+
+        GlobalApi.addFurniture(furnitureToAPI).then(async(resp)=>{
+            console.log("attempted to add new Furniture",resp)
+            getFurnitures();
+
+        })
+        
+
+        imageChangeTracker=newFurniture.image[0];
         setFurnitures([...furnitures, newFurniture]);
         setAllFurnitures([...allFurnitures,newFurniture])
         // Reset the form and hide it
         setNewFurnitureName('');
         setImageUri(null)
         setShowAddFurnitureForm(false);
+        setSelectedFurnitures([]);
+        
     };
 
    
@@ -211,9 +238,15 @@ useEffect(()=>{
                             )}
                                 </TouchableOpacity>
                                 <TouchableOpacity onPress={handleSubmitNewFurniture}>
+                        {isNewFurnitureLoading ? ( // Render spinner if isNewRoomAdditionLoading is true
+                            <View style={[styles.addButtonForm, { marginRight: 10 }]}>
+                                <ActivityIndicator size="small" color="green" />
+                            </View>
+                            ) : (
                                     <View style={[styles.addButtonForm, { marginRight: 10 }]}>
                                         <Text style={styles.buttonText}><FontAwesome6 name="add" size={20} color="green" /></Text>
-                                    </View>
+                                    </View>                            )} 
+                            
                                 </TouchableOpacity>
                                 <TouchableOpacity onPress={() => setShowAddFurnitureForm(false)}>
                                     <View style={styles.cancelBtn}>

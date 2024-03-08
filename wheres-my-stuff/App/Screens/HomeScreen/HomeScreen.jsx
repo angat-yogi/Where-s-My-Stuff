@@ -16,9 +16,8 @@ export default function HomeScreen() {
 const getRooms = () => {
   try{
   GlobalApi.getDefaultRooms().then(async (resp) => {
-      const customizedRoomsForUser=resp.rooms.filter(r=>r.addedBy==='admin@wms.com'||r.addedBy===user?.emailAddresses[0].emailAddress)
+      const customizedRoomsForUser=resp?.rooms?.filter(r=>r.addedBy==='admin@wms.com'||r.addedBy===user?.emailAddresses[0].emailAddress)
       setRooms(customizedRoomsForUser)
-      console.log("resp",resp.rooms)
   })
   }
   catch(error){
@@ -49,7 +48,6 @@ const getRooms = () => {
   // Function to handle refresh action
   const onRefresh = () => {
     setRefreshing(true);
-    console.log("page refreshed")
     setRefreshing(false);
   };
 

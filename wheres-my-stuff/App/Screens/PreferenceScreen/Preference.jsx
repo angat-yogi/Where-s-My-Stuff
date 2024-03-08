@@ -9,7 +9,7 @@ import { useUser } from '@clerk/clerk-expo';
 import { useNavigation } from '@react-navigation/native';
 import StorageTypeByRoom from './StorageTypeByRoom';
 import GlobalApi from '../../API/GlobalApi';
-import { data } from '@tensorflow/tfjs';
+import ImageAPI from '../../API/ImageAPI';
 const Preference = () => {
     const navigation = useNavigation();
     const { user, isLoading } = useUser();
@@ -23,12 +23,13 @@ const Preference = () => {
     const [rooms,setRooms] = useState([ ]);
     const [allFurnitures, setAllFurnitures] = useState([]);
     const [error,setError]=useState(false);
-    const [selectedRoomType, setSelectedRoomType] = React.useState(null);
+    const [selectedRoomType, setSelectedRoomType] =useState(null);
+    const [isNewRoomAdditionLoading,setIsNewRoomAdditionLoading]=useState(false);
 
-useEffect(()=>{
     const getFurnitures = () => {
         try{
         GlobalApi.getDefaultFurnitures().then(async (resp) => {
+            console.log("funritures from pref",resp)
             setAllFurnitures(resp.furnitures)
         })
         }
@@ -36,9 +37,9 @@ useEffect(()=>{
             console.error("Error fetching default furnitures:", error);
         };
 
-        console.log("Api called from preference",allFurnitures)
 
     };
+useEffect(()=>{
     getFurnitures();
 },[selectedRooms.length])
 
@@ -48,14 +49,12 @@ useEffect(()=>{
         GlobalApi.getDefaultRooms().then(async (resp) => {
             const customizedRoomsForUser=resp.rooms.filter(r=>r.addedBy==='admin@wms.com'||r.addedBy===user?.emailAddresses[0].emailAddress)
             setRooms(customizedRoomsForUser)
-            console.log("resp",resp.rooms)
         })
         }
         catch(error){
             console.error("Error fetching default furnitures:", error);
         };
 
-        console.log("Api called",rooms)
 
     };
     getRooms();
@@ -70,6 +69,7 @@ useEffect(()=>{
 
 
     const doneClicked = async () => {
+        getFurnitures();
         if (!selectedRooms) {
             return; // Exit if no rooms are selected
         }
@@ -87,18 +87,20 @@ useEffect(()=>{
                     }
                 };
     
-                console.log("data going into API",data)
                 try {
-                    const furnitureExists = allFurnitures.some(existingFurniture => existingFurniture.name === furniture.name);
+
+                    console.log("allFurnitures from pref",allFurnitures)
+                    console.log(furniture.name)
+                    const furnitureExists = allFurnitures.some(existingFurniture => existingFurniture.name.toLowerCase().trim() === furniture.name.toLowerCase().trim());
+                    console.log(furnitureExists)
                     if (furnitureExists) {
-                        console.log(`Furniture ${furniture.name} already exists.`);
                         GlobalApi.addUserInitialOldFurnitures(data).then(async(resp)=>{
                             console.log("resp from existing",resp)
                         })
                     } else {
-                        console.log(`Furniture ${furniture.name} does not exists.`);
                         GlobalApi.addUserInitialNewFurnitures(data).then(async(resp)=>{
                             console.log("resp from new",resp)
+                            
                         })
                     }
                 } catch (error) {
@@ -147,8 +149,6 @@ useEffect(()=>{
             ],
             { cancelable: false }
         );
-        
-         
     };
     
 
@@ -166,15 +166,26 @@ useEffect(()=>{
     };
     
  
-    const handleAddRoom = () => {
-        console.log("called this method")
+    const handleAddRoom = async () => {
+
+        
     if (newRoomName.trim() !== ''&&selectedRoomType!== null&&image.trim() !== '') {
         let roomExists=rooms.find(r=>r.roomDisplayName.toLowerCase()===newRoomName.trim().toLowerCase());
         if(roomExists){
             Alert.alert("Room already exists","Sorry we already have a name with that Room",[{ text: 'OK', onPress: () => console.log('OK Pressed') }])
         }
         else{
-        const newRoom = { id: rooms.length + 1, roomDisplayName: newRoomName.trim() ,imageUri:image,roomType:selectedRoomType};
+
+            setIsNewRoomAdditionLoading(true)
+            const imageFile = {
+                uri: image,
+                type: 'image/jpeg', // adjust the type based on the image format
+                name: `${user.firstName}${newRoomName.trim().toLowerCase()}${selectedRoomType.trim().toLowerCase()}${Date.now().toString()}.jpg`, // you can use any name for the file
+            };
+
+            const imageFromCamera = await ImageAPI.uploadImageAPI(imageFile);
+            setIsNewRoomAdditionLoading(false);
+        const newRoom = { id: rooms.length + 1, roomDisplayName: newRoomName.trim() ,imageUri:imageFromCamera.url,roomType:selectedRoomType};
         console.log("newRoom",newRoom)
 
         const data={
@@ -258,7 +269,7 @@ const handleNavigateToStorageTypes = () => {
                 </View>
                 
             </View>
-        <RoomForm selectedRoomType={selectedRoomType} setSelectedRoomType={setSelectedRoomType} handleAddRoom={handleAddRoom} isAddingNewRoom={isAddingNewRoom} newRoomName={newRoomName} setIsAddingNewRoom={setIsAddingNewRoom} setNewRoomName={setNewRoomName} image={image} setImage={setImage}/>
+        <RoomForm isNewRoomAdditionLoading={isNewRoomAdditionLoading} selectedRoomType={selectedRoomType} setSelectedRoomType={setSelectedRoomType} handleAddRoom={handleAddRoom} isAddingNewRoom={isAddingNewRoom} newRoomName={newRoomName} setIsAddingNewRoom={setIsAddingNewRoom} setNewRoomName={setNewRoomName} image={image} setImage={setImage}/>
        <View style={{paddingBottom:20,paddingTop:20}}>
        <TouchableOpacity style={styles.nextButton} onPress={handleNavigateToStorageTypes}>
                 {selectedRooms.length!=0?(<Text style={styles.nextButtonText}>Next: Choose Storage Types</Text>):(<Text style={styles.nextButtonText}>Skip</Text>)}

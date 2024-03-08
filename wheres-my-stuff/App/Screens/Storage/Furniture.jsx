@@ -7,7 +7,6 @@ import { AntDesign } from '@expo/vector-icons';
 const { width } = Dimensions.get('window');
 const imageWidth = width / 2;
 const Furniture = ({ route }) => {
-    console.log(route)
     const { user, isLoading } = useUser();
     const [items, setItems] = React.useState([]);
     const [showModal, setShowModal] = React.useState(false);

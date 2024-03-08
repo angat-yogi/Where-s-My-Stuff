@@ -1,8 +1,9 @@
-import { View, Text, StyleSheet, Image, TouchableOpacity } from "react-native";
+import { View, Text, StyleSheet, Image, TouchableOpacity, Dimensions } from "react-native";
 import React from "react";
 import { useOAuth } from "@clerk/clerk-expo";
 import { useWarmUpBrowser } from "../../hooks/warmUpBrowser";
 import * as WebBrowser from "expo-web-browser";
+const { width,height } = Dimensions.get('window');
 
 import Colors from "../../Utils/Colors";
 
@@ -27,7 +28,7 @@ export default function Login() {
     }
   }, []);
   return (
-    <View style={{ alignItems: "center" }}>
+    <View style={{ flex:1,flexDirection:'column',height:height,width:width }}>
       <Image
         source={require("../../../assets/images/login.png")}
         style={styles.imageContainer}
@@ -84,26 +85,30 @@ const styles = StyleSheet.create({
     borderWidth: 4,
     borderColor: Colors.BLACK,
     borderRadius: 15,
+    alignSelf: 'center', // Center the image horizontally
   },
   subContainer: {
-    width: "100%",
+    flex: 1,
     backgroundColor: Colors.PRIMARY,
-    height: "70%",
-    marginTop: -20,
+    paddingTop: 20, // Padding from the top instead of marginTop
+    paddingHorizontal: 20, // Padding horizontally
     borderTopLeftRadius: 30,
     borderTopRightRadius: 30,
-    padding: 20,
+    justifyContent: 'center',
+    paddingBottom:29 // Center items vertically
   },
   buttonContainer: {
     flexDirection: "row",
-    justifyContent: "space-between",
+    justifyContent: "space-evenly", // Evenly distribute buttons
     width: "100%",
+    marginTop: 20, // Add some margin from the previous text
   },
   button: {
-    width: "48%", // Adjust width as needed
     backgroundColor: Colors.WHITE,
     borderRadius: 99, // Example border radius, adjust as needed
-    padding: 15, // Adjust padding as needed
-    marginTop: 50,
+    paddingVertical: 15, // Adjust padding as needed
+    paddingHorizontal: 20, // Adjust padding as needed
+    alignItems: 'center', // Center text horizontally
   },
 });
+

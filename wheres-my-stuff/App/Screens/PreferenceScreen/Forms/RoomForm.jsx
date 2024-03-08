@@ -1,110 +1,112 @@
 import React, { useEffect, useState } from 'react';
-import {Image, KeyboardAvoidingView, Modal, Text, TextInput, TouchableOpacity, View} from 'react-native';
-import { StyleSheet} from "react-native";
+import { Alert, ActivityIndicator, Image, KeyboardAvoidingView, Modal, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { StyleSheet } from "react-native";
 import { FontAwesome } from '@expo/vector-icons';
 import { EvilIcons } from '@expo/vector-icons';
 import * as ImagePicker from "expo-image-picker";
 import Colors from '../../../Utils/Colors';
-import { SelectList } from 'react-native-dropdown-select-list'
+import { SelectList } from 'react-native-dropdown-select-list';
 import RoomType from '../../../Utils/Enums';
+import ImageAPI from '../../../API/ImageAPI';
+import { useUser } from '@clerk/clerk-expo';
 
-const RoomForm =({image,selectedRoomType,setSelectedRoomType,isAddingNewRoom,setNewRoomName,setIsAddingNewRoom,handleAddRoom,newRoomName,setImage}) => {
+const RoomForm = ({ isNewRoomAdditionLoading, image, selectedRoomType, setSelectedRoomType, isAddingNewRoom, setNewRoomName, setIsAddingNewRoom, handleAddRoom, newRoomName, setImage }) => {
+    const { user, isLoading } = useUser();
     const [isFormComplete, setIsFormComplete] = useState(false);
+
     useEffect(() => {
-        setIsFormComplete(newRoomName.trim() !== '' && image !== null&&selectedRoomType!==null);
-    }, [newRoomName, image,selectedRoomType]);
-    
+        setIsFormComplete(newRoomName.trim() !== '' && image !== null && selectedRoomType !== null);
+    }, [newRoomName, image, selectedRoomType]);
+
     const pickImages = async () => {
         setImage(null);
         let result = await ImagePicker.launchImageLibraryAsync({
-          mediaTypes: ImagePicker.MediaTypeOptions.Images,
-          aspect: [4, 3],
-          quality: 1,
-          allowsEditing: true,
+            mediaTypes: ImagePicker.MediaTypeOptions.Images,
+            aspect: [4, 3],
+            quality: 1,
+            allowsEditing: true,
         });
-    
-        console.log(result);
-    
-        if (!result.canceled) {
-            console.log("result",result)
-          const selectedImage = result.assets[0].uri;
-          setImage(selectedImage);
-          console.log(image)
 
+        if (!result.cancelled) {
+            setImage(result.assets[0].uri);
         }
-        
-      };
-    
-      const takePicture=async()=>{
+    };
+
+    const takePicture = async () => {
         setImage(null);
         try {
-          let result= await ImagePicker.launchCameraAsync({
-            cameraType:ImagePicker.CameraType.back,
-            allowsEditing:true,
-            aspect:[4,3],
-            quality:1
-          });
-          if (!result.cancelled) {
-            console.log(result)
-            setImage(result.assets[0].uri);
-            console.log("picture taken",image)
-          }
-          else{
-            console.log("could not load image")
-          }
+            let result = await ImagePicker.launchCameraAsync({
+                cameraType: ImagePicker.CameraType.back,
+                allowsEditing: true,
+                aspect: [4, 3],
+                quality: 1
+            });
+
+            if (!result.cancelled) {
+                setImage(result.assets[0].uri);
+            }
+            else {
+                console.log("could not load image")
+            }
         } catch (error) {
-          Alert.alert('Error saving the picture: '+error)
+            Alert.alert('Error saving the picture: ' + error)
         }
-      }
-      const addButtonStyle = isFormComplete ? styles.addButton : [styles.addButton, styles.disabledButton];
-      const disabledButtonStyle = {
+    }
+
+    const addButtonStyle = isFormComplete ? styles.addButton : [styles.addButton, styles.disabledButton];
+    const disabledButtonStyle = {
         backgroundColor: '#ccc', // Grey background color
     };
+
     return (
         <View>
-           <Modal visible={isAddingNewRoom} animationType="slide" transparent>
+            <Modal visible={isAddingNewRoom} animationType="slide" transparent>
                 <View style={styles.modalBackground}>
                     <KeyboardAvoidingView style={styles.modalContent} behavior="padding">
                         <Text style={styles.modalTitle}>Add New Room</Text>
-                        {image ? (
-                <Image source={{ uri: image }} style={styles.selectedImage} />
-            ) : (
-                <View>
-                <Text style={styles.imageRequiredText}>* Image is required</Text>
-                </View>
-            )}         
+                                {image ? (
+                                    <Image source={{ uri: image }} style={styles.selectedImage} />
+                                ) : (
+                                    <View>
+                                        <Text style={styles.imageRequiredText}>* Image is required</Text>
+                                    </View>
+                                )}        
                         <TextInput
                             style={styles.input}
                             placeholder="Enter room name"
                             value={newRoomName}
                             onChangeText={(text) => setNewRoomName(text)}
-                        />   
+                        />
                         <View style={styles.selectListContainer}>
-                        <SelectList 
-                            setSelected={(val) => setSelectedRoomType(val)} 
-                            containerStyle={styles.selectList}
-                            textStyle={styles.selectListText}
-                            itemStyle={styles.selectListItem}
-                            selectedItemStyle={styles.selectListItemSelected}
-                            data={Object.values(RoomType)} // Pass array of enum values to SelectList
-                            save="value"
-                            placeholder="Select Room Type"
-                            defaultOption="Other"
-                            search={false}
-                        /> 
+                            <SelectList
+                                setSelected={(val) => setSelectedRoomType(val)}
+                                containerStyle={styles.selectList}
+                                textStyle={styles.selectListText}
+                                itemStyle={styles.selectListItem}
+                                selectedItemStyle={styles.selectListItemSelected}
+                                data={Object.values(RoomType)} // Pass array of enum values to SelectList
+                                save="value"
+                                placeholder="Select Room Type"
+                                defaultOption="Other"
+                                search={false}
+                            />
                         </View>
-                                        
-                        <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-around",paddingBottom:20}}>
+
+                        <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-around", paddingBottom: 20 }}>
                             <TouchableOpacity onPress={takePicture}>
-                            <EvilIcons name="camera" size={30} color={Colors.BEIGE} style={{ marginHorizontal: 10 }}/>
+                                <EvilIcons name="camera" size={30} color={Colors.BEIGE} style={{ marginHorizontal: 10 }} />
                             </TouchableOpacity>
                             <TouchableOpacity onPress={pickImages}>
-                            <FontAwesome name="files-o" size={30} color={Colors.BEIGE} style={{ marginHorizontal: 10 }}/>
+                                <FontAwesome name="files-o" size={30} color={Colors.BEIGE} style={{ marginHorizontal: 10 }} />
                             </TouchableOpacity>
                         </View>
-                        <TouchableOpacity  style={isFormComplete ? addButtonStyle : [addButtonStyle, disabledButtonStyle]}  onPress={handleAddRoom} disabled={!isFormComplete}>
-                            <Text style={styles.addButtonText}>Add Room</Text>
-                        </TouchableOpacity>
+                        <TouchableOpacity style={isFormComplete ? addButtonStyle : [addButtonStyle, disabledButtonStyle]} onPress={handleAddRoom} disabled={!isFormComplete||isNewRoomAdditionLoading}>
+                        {isNewRoomAdditionLoading ? ( // Render spinner if isNewRoomAdditionLoading is true
+                                <ActivityIndicator size="small" color="white" />
+                            ) : (
+                                <Text style={styles.addButtonText}>Add Room</Text>
+                            )}                        
+                            </TouchableOpacity>
 
                         <TouchableOpacity style={styles.closeButton} onPress={() => setIsAddingNewRoom(false)}>
                             <Text style={styles.closeButtonText}>Close</Text>
@@ -123,7 +125,7 @@ const styles = StyleSheet.create({
         width: '80%',
         marginBottom: 20,
         paddingHorizontal: 10,
-        paddingBottom:10,
+        paddingBottom: 10,
         paddingVertical: 8,
     },
     selectList: {
@@ -133,7 +135,7 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         marginBottom: 20,
         paddingHorizontal: 10,
-        paddingBottom:10,
+        paddingBottom: 10,
         paddingVertical: 8,
     },
     selectListText: {
@@ -179,7 +181,7 @@ const styles = StyleSheet.create({
         width: '80%',
         marginBottom: 20,
     },
-    
+
     addButtonText: {
         color: 'white',
         fontSize: 18,
@@ -189,7 +191,7 @@ const styles = StyleSheet.create({
         paddingVertical: 10,
         paddingHorizontal: 20,
         borderRadius: 10,
-        marginBottom:10
+        marginBottom: 10
     },
     closeButtonText: {
         color: 'white',

@@ -16,8 +16,6 @@ const ClothForm = () => {
   };
 
   const handleSubmit = () => {
-    console.log('Brand Name:', brandName);
-    console.log('Size:', size);
 
     // Implement submit logic here
     Alert.alert('Submitted', 'Thankn you!', [{ text: 'OK', onPress: () => console.log('OK Pressed') }]);

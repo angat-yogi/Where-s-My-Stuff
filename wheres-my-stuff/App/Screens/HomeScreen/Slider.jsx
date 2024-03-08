@@ -15,7 +15,6 @@ import React, { useEffect, useState } from "react";
 import Heading from "../../Shared/Heading";
 
 export default function Slider({ data, heading, isViewAll,plus, styleImage,displayHeading}) {
-  console.log(data)
   const navigation = useNavigation();
   const handlePress = (item, action) => {
     if (action != null&& item) {

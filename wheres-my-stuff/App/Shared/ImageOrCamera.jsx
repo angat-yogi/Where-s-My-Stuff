@@ -1,5 +1,5 @@
 import React from 'react';
-import { Modal, View, TouchableOpacity, StyleSheet, Image, Text, Dimensions } from 'react-native';
+import { Modal, View, TouchableOpacity, StyleSheet, Image, Text, Dimensions, Alert } from 'react-native';
 import { EvilIcons, FontAwesome } from '@expo/vector-icons'; // Import icons from Expo
 import * as ImagePicker from "expo-image-picker";
 
@@ -7,6 +7,11 @@ const ImageOrCamera = ({ isVisible, displayCamera, displayImagePicker, imageUri,
 
     const takePicture = async () => {
         try {
+            const permissionResult = await ImagePicker.requestCameraPermissionsAsync();
+            if (permissionResult.granted === false) {
+                alert('Camera permission is required to take a picture.');
+                return;
+            }
             let result = await ImagePicker.launchCameraAsync({
                 cameraType: ImagePicker.CameraType.back,
                 allowsEditing: true,
@@ -15,7 +20,6 @@ const ImageOrCamera = ({ isVisible, displayCamera, displayImagePicker, imageUri,
             });
             if (!result.cancelled) {
                 setImageUri(result.assets[0].uri);
-                console.log("imageUri",imageUri)
 
             }
             else {
@@ -42,7 +46,6 @@ const ImageOrCamera = ({ isVisible, displayCamera, displayImagePicker, imageUri,
 
         if (!result.cancelled) {
             setImageUri(result.assets[0].uri);
-            console.log("imageUri",imageUri)
 
         }
     };

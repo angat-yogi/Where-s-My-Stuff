@@ -19,17 +19,6 @@ export default function AddToDoScreen() {
   const [toDoInfo, setToDoInfo] = useState({});
 
   const { user, isLoading } = useUser();
-  //   console.log(user);
-  //   const handleDateChange = (event, selectedDate) => {
-  //     const currentDate = event.value.date;
-  //     setShowDatePicker(false);
-  //     setSelectedDate(currentDate);
-  //   };
-
-  //   const showDatepickerFunction = () => {
-  //     console.log("triggered");
-  //     setShowDatePicker(true);
-  //   };
 
   const addToDo = (values) => {
     setSelectedDate(values.date);
