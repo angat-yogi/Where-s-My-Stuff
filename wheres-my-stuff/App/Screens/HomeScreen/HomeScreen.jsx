@@ -4,15 +4,16 @@ import Header from "./Header";
 import Slider from "./Slider";
 import GlobalApi from "../../API/GlobalApi";
 import { useUser } from "@clerk/clerk-expo";
+import { useSharedState } from "../../State/SharedStateProvider";
 
 export default function HomeScreen() {
   const [categories, setCategories] = useState();
   const [fashions, setFashions] = useState();
   const [storageTypes, setStorageTypes] = useState();
   const [rooms,setRooms]=useState([]);
-
+  const { sharedState, setSharedState } = useSharedState();
   const { user, isLoading } = useUser();
-
+console.log("rooms from state",sharedState.selectedRooms)
 const getRooms = () => {
   try{
   GlobalApi.getDefaultRooms().then(async (resp) => {
@@ -23,9 +24,6 @@ const getRooms = () => {
   catch(error){
       console.error("Error fetching default furnitures:", error);
   };
-
-  console.log("Api called",rooms)
-
 };
 
   const getCategories = () => {

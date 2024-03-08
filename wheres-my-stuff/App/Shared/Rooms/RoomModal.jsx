@@ -8,6 +8,7 @@ import GlobalApi from '../../API/GlobalApi';
 import ImageAPI from '../../API/ImageAPI';
 import ImageOrCamera from '../ImageOrCamera';
 import { useUser } from '@clerk/clerk-expo';
+import { useSharedState } from '../../State/SharedStateProvider';
 
 const RoomModal = ({ modalVisible, data, onNext, setModalVisible, onClose,onPrev,disbaleNextBtn,disablePrevButton,totalRooms,roomIndex,doneClicked }) => {
     const { user, isLoading } = useUser();
@@ -15,11 +16,14 @@ const RoomModal = ({ modalVisible, data, onNext, setModalVisible, onClose,onPrev
     const [openCameraModal,setOpenCameraModal]=useState(false)
     const [imageUri,setImageUri]=useState(null)
     const [allFurnitures, setAllFurnitures] = useState([]);
+    const { sharedState, setSharedState } = useSharedState();
     const [allFurnituresForUser, setAllFurnituresForUser] = useState([]);
     const [nextPrevClicked,setNextPrevClicked]=useState(null)
-    const [newFurnitureTracking,setNewFurnitureTracking]=useState(false);
     const [isNewFurnitureLoading,setIsNewFurnitureLoading]=useState(false);
-    let imageChangeTracker='';
+    const [furnitures, setFurnitures] = useState([]);
+    const [selectedFurnitures, setSelectedFurnitures] = useState([]);
+    const [showAddFurnitureForm, setShowAddFurnitureForm] = useState(false);
+    const [newFurnitureName, setNewFurnitureName] = useState('');
 
     const getFurnitures = () => {
         try {
@@ -34,7 +38,7 @@ const RoomModal = ({ modalVisible, data, onNext, setModalVisible, onClose,onPrev
                         if (
                             (furniture.email === 'admin@wms.com' && !furniture.room) ||
                             (userFurniture.userEmail === user.emailAddresses[0].emailAddress &&
-                                userFurniture.room?.toLowerCase().replace(/\s/g, '') === data.roomType.toLowerCase())
+                                userFurniture.room?.toLowerCase().replace(/\s/g, '') === data?.roomType.toLowerCase())
                         ) {
                             // Check if the furniture ID is not already in the addedFurnitureIds array
                             if (!addedFurnitureIds.includes(furniture.id)) {
@@ -48,19 +52,22 @@ const RoomModal = ({ modalVisible, data, onNext, setModalVisible, onClose,onPrev
                 });
 
                  setFurnitures(filteredFurnitures);
-                 console.log(filteredFurnitures)
                 setLoading(false);
             });
 
             GlobalApi.getDefaultFurnitures().then(async (resp) => {
                 setAllFurnitures(resp.furnitures)
+                setSharedState(prevState => ({
+                    ...prevState,
+                    allFurnitures: resp.furnitures // Assuming the API response contains the updated data
+                }));
                 const filteredUserFurnitures = [];
 
                 resp.furnitures.forEach(f => {
                     if (f.email === 'admin@wms.com' || f.email.toLowerCase() === user.emailAddresses[0].emailAddress.toLowerCase()) {
                         // Include the furniture item in the filteredUserFurnitures array
                         filteredUserFurnitures.push(f);
-                        if (f.room && f.room.toLowerCase() !== data.roomType.toLowerCase()) {
+                        if (f.room && f.room.toLowerCase() !== data?.roomType.toLowerCase()) {
                             // If the furniture has a room specified and it's not the desired room, remove it from filteredUserFurnitures
                             const indexToRemove = filteredUserFurnitures.findIndex(item => item.id === f.id);
                             if (indexToRemove !== -1) {
@@ -80,16 +87,12 @@ const RoomModal = ({ modalVisible, data, onNext, setModalVisible, onClose,onPrev
 useEffect(()=>{
    
     getFurnitures();
-},[data.roomType,nextPrevClicked,allFurnituresForUser.length])
+},[data?.roomType,nextPrevClicked,allFurnituresForUser.length])
 
-    
-    const [furnitures, setFurnitures] = useState([]);
-    const [selectedFurnitures, setSelectedFurnitures] = useState([]);
-    const [showAddFurnitureForm, setShowAddFurnitureForm] = useState(false);
-    const [newFurnitureName, setNewFurnitureName] = useState('');
-
+  
     const handleCloseModal = () => {
-        setModalVisible(false); // Call setModalVisible to close the modal
+        setModalVisible(false); 
+        onClose()// Call setModalVisible to close the modal
     };
 
     const toggleFurnitureSelection = (furniture) => {
@@ -102,6 +105,22 @@ useEffect(()=>{
     };
 
     const prevClicked=()=>{
+        const selectedRoomIndex = sharedState.selectedRooms.findIndex(room => room.roomDisplayName === data.roomDisplayName);
+
+        setSharedState(prevState => {
+            const updatedSelectedRooms = [...prevState.selectedRooms]; // Clone the selectedRooms array
+            
+            // Update the furnitures property of the first selected room
+            updatedSelectedRooms[selectedRoomIndex] = {
+                ...updatedSelectedRooms[selectedRoomIndex], // Clone the selected room object
+                furnitures: selectedFurnitures, // Update the furnitures property
+            };
+        
+            return {
+                ...prevState,
+                selectedRooms: updatedSelectedRooms, // Update the selectedRooms property with the updated array
+            };
+        });
         setSelectedFurnitures([]);
         onPrev();
         setNextPrevClicked(true);
@@ -111,11 +130,25 @@ useEffect(()=>{
 
     const nextClicked=()=>{
         data.furnitures=selectedFurnitures;
+        const selectedRoomIndex = sharedState.selectedRooms.findIndex(room => room.roomDisplayName === data.roomDisplayName);
+        setSharedState(prevState => {
+            const updatedSelectedRooms = [...prevState.selectedRooms]; // Clone the selectedRooms array
+            
+            // Update the furnitures property of the first selected room
+            updatedSelectedRooms[selectedRoomIndex] = {
+                ...updatedSelectedRooms[selectedRoomIndex], // Clone the selected room object
+                furnitures: selectedFurnitures, // Update the furnitures property
+            };
+        
+            return {
+                ...prevState,
+                selectedRooms: updatedSelectedRooms, // Update the selectedRooms property with the updated array
+            };
+        });
         setSelectedFurnitures([])
         onNext()
         setNextPrevClicked(true)
         setShowAddFurnitureForm(false)
-
     }
 
     
@@ -150,14 +183,10 @@ useEffect(()=>{
             email:user.emailAddresses[0].emailAddress,
             image:imageFromCamera.url
         }
-        
         newFurniture.image=[imageFromCamera.url]
         setIsNewFurnitureLoading(false);
 
-        console.log("adding new furniture",newFurniture)
-
-        GlobalApi.addFurniture(furnitureToAPI).then(async(resp)=>{
-            console.log("attempted to add new Furniture",resp)
+        await GlobalApi.addFurniture(furnitureToAPI).then(async(resp)=>{
             getFurnitures();
 
         })
@@ -196,10 +225,11 @@ useEffect(()=>{
             visible={modalVisible}
             onRequestClose={onClose}
         >
+    
             <View style={styles.modalContainer}>
                 <KeyboardAvoidingView style={[styles.modalContent, { width: windowWidth * 0.9, height: windowHeight * 0.8 }]} behavior="padding">
-                    <Text style={styles.modalTitle}>{data.roomDisplayName}</Text>
-                    {data.imageUri && <Image source={{ uri: data.imageUri }} style={styles.selectedImage} />}
+                    <Text style={styles.modalTitle}>{data?.roomDisplayName}</Text>
+                    {data?.imageUri && <Image source={{ uri: data?.imageUri }} style={styles.selectedImage} />}
                     <Text style={styles.modalDescription}>This is where you can customize your living room storage options.</Text>
                     
                     <ScrollView horizontal={true}  showsHorizontalScrollIndicator={false} contentContainerStyle={styles.furnitureOptionsContainer}>

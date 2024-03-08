@@ -10,7 +10,6 @@ const imageWidth = width / 2;
 const Room = ({ route }) => {
     const { user, isLoading } = useUser();
     const [userFurnitures, setUserFurnitures] = useState([]);
-   console.log(route)
     const getFurnitures = () => {
         try {
             GlobalApi.getUserFurnitures().then(async (resp) => {

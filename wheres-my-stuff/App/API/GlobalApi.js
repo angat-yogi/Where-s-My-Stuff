@@ -25,7 +25,7 @@ const getClosetsContents = async () => {
     result = await graphQLClient.request(query);
 
   } catch (error) {
-    console.log("error on api:", error);
+    console.error("error on api:", error);
   }
   return result;
 };
@@ -47,7 +47,7 @@ const getCategories = async () => {
   try {
     result = await graphQLClient.request(query);
   } catch (error) {
-    console.log("error on api:", error);
+    console.error("error on api:", error);
   }
   return result;
 };
@@ -79,7 +79,7 @@ const addToDos = async (data) => {
   try {
     result = await request(URL, mutationQuery);
   } catch (error) {
-    console.log("error on api:", error);
+    console.error("error on api:", error);
   }
   return result;
 };
@@ -107,7 +107,7 @@ try {
   result = await request(URL, mutationQuery);
   Alert.alert('Success', 'Successfull, Closing the closet', [{ text: 'OK', onPress: () => console.log('OK Pressed') }]);
 } catch (error) {
-  console.log("error on api:", error);
+  console.error("error on api:", error);
   Alert.alert('Error', 'Closing the closet anyway', [{ text: 'OK', onPress: () => console.log('OK Pressed') }]);
 
 }
@@ -136,7 +136,7 @@ try {
   result = await request(URL, mutationQuery);
   Alert.alert('Success', 'Successfully organized closet', [{ text: 'OK', onPress: () => console.log('OK Pressed') }]);
 } catch (error) {
-  console.log("error on api:", error);
+  console.error("error on api:", error);
   Alert.alert('Error', 'Unsuccessful in organizing closet', [{ text: 'OK', onPress: () => console.log('OK Pressed') }]);
 
 }
@@ -166,7 +166,7 @@ try {
   result = await request(URL, mutationQuery);
   Alert.alert('Success', 'Successfully organized closet', [{ text: 'OK', onPress: () => console.log('OK Pressed') }]);
 } catch (error) {
-  console.log("error on api:", error);
+  console.error("error on api:", error);
   Alert.alert('Error', 'Unsuccessful in organizing closet', [{ text: 'OK', onPress: () => console.log('OK Pressed') }]);
 
 }
@@ -202,7 +202,7 @@ const addUserInitialOldRooms = async (data) => {
 try {
   result = await request(URL, mutationQuery);
 } catch (error) {
-  console.log("error on api:", error);
+  console.error("error on api:", error);
 
 }
 return result;
@@ -241,7 +241,7 @@ const addUserInitialNewRooms = async (data) => {
 try {
   result = await request(URL, mutationQuery);
 } catch (error) {
-  console.log("error on api:", error);
+  console.error("error on api:", error);
 
 }
 return result;
@@ -269,7 +269,7 @@ const addUserInitialOldFurnitures = async (data) => {
 try {
   result = await request(URL, mutationQuery);
 } catch (error) {
-  console.log("error on api:", error);
+  console.error("error on api:", error);
 
 }
 return result;
@@ -296,12 +296,10 @@ const addFurniture =async (data)=>{
     }
   }
   `;
-  console.log("adding new furnitures API Query",mutationQuery)
 try {
   result = await request(URL, mutationQuery);
-  console.log("result for adding furnitures",result)
 } catch (error) {
-  console.log("error on api:", error);
+  console.error("error on api:", error);
 
 }
 return result;
@@ -330,11 +328,10 @@ const addUserInitialNewFurnitures = async (data) => {
   }
   
   `;
-  console.log("mutationQuery",mutationQuery)
 try {
   result = await request(URL, mutationQuery);
 } catch (error) {
-  console.log("error on api:", error);
+  console.error("error on api:", error);
 
 }
 return result;
@@ -351,13 +348,12 @@ const publishUserFurnitures = async () => {
     }
   }
   `;
-  console.log("mutationQuery",mutationQuery)
 try {
   result = await request(URL, mutationQuery);
   if(result.publishManyUserFurnitures.count>0){
   }
 } catch (error) {
-  console.log("error on api:", error);
+  console.error("error on api:", error);
 }
 return result;
 };
@@ -378,7 +374,7 @@ try {
   if(result.publishManyFurnitures.count>0){
   }
 } catch (error) {
-  console.log("error on api:", error);
+  console.error("error on api:", error);
 }
 return result;
 };
@@ -404,7 +400,7 @@ const getUserFurnitures = async () => {
   try {
     result = await graphQLClient.request(query);
   } catch (error) {
-    console.log("error on api:", error);
+    console.error("error on api:", error);
   }
   return result;
 };
@@ -425,7 +421,7 @@ const getDefaultFurnitures = async () => {
   try {
     result = await graphQLClient.request(query);
   } catch (error) {
-    console.log("error on api:", error);
+    console.error("error on api:", error);
   }
   return result;
 };
@@ -448,7 +444,7 @@ const getDefaultRooms = async () => {
   try {
     result = await graphQLClient.request(query);
   } catch (error) {
-    console.log("error on api:", error);
+    console.error("error on api:", error);
   }
   return result;
 };
@@ -471,7 +467,7 @@ const getTrendingFashions = async () => {
   try {
     result = await graphQLClient.request(query);
   } catch (error) {
-    console.log("error on api:", error);
+    console.error("error on api:", error);
   }
   return result;
 };
@@ -491,7 +487,7 @@ const getStorageTypes = async () => {
   try {
     result = await graphQLClient.request(query);
   } catch (error) {
-    console.log("error on api:", error);
+    console.error("error on api:", error);
   }
   return result;
 };
@@ -512,7 +508,7 @@ const getItemsStorageCoordinates = async () => {
   try {
     result = await graphQLClient.request(query);
   } catch (error) {
-    console.log("error on api:", error);
+    console.error("error on api:", error);
   }
   return result;
 };

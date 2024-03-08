@@ -46,7 +46,7 @@ const RoomForm = ({ isNewRoomAdditionLoading, image, selectedRoomType, setSelect
                 setImage(result.assets[0].uri);
             }
             else {
-                console.log("could not load image")
+                console.error("could not load image")
             }
         } catch (error) {
             Alert.alert('Error saving the picture: ' + error)

@@ -30,35 +30,6 @@ export default function CameraComponent() {
   };
   
 let data=null;
-  // const takePicture = async () => {
-  //   if (cameraRef.current) {
-  //     try {
-  //       const options = { quality: 0.5, skipProcessing: false };
-  //       const imagedata = await cameraRef.current.takePictureAsync(options);
-  //       console.log("imageData: ",imagedata)
-        
-  //       const base64Image = await FileSystem.readAsStringAsync(imagedata.uri, { encoding: FileSystem.EncodingType.Base64 });
-
-  //       // Handle the captured picture URI
-  //       const source = imagedata?.uri;
-  //       if (source) {
-  //        await cameraRef.current.pausePreview();
-  //            }
-  //        data = {
-  //         userId: user?.emailAddresses[0]?.emailAddress,
-  //         image:{url: imagedata.uri},
-  //       };
-    
-  //       GlobalApi.addclosetContents(data).then((resp) => {
-  //         // ToastAndroid.show("Photo added successfully", ToastAndroid.LONG);
-  //         Alert.alert('Success', 'Photo added successfully', [{ text: 'OK', onPress: () => console.log('OK Pressed') }]);
-
-  //       });
-  //     } catch (error) {
-  //       console.error('Error taking picture:', error);
-  //     }
-  //   }
-  // };
 
   const takePicture=async()=>{
     try {
@@ -72,7 +43,7 @@ let data=null;
         setImage( result.assets[0].uri);
       }
       else{
-        console.log("could not load image")
+        console.error("could not load image")
       }
     } catch (error) {
       Alert.alert('Error saving the picture: '+error)
