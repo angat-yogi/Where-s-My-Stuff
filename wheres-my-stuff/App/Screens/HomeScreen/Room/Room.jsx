@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { FlatList, Image, ScrollView, Text, TouchableOpacity, View, StyleSheet, Dimensions } from 'react-native';
 import GlobalApi from '../../../API/GlobalApi';
-import Heading from '../../../Shared/Heading';
 import Header from '../Header';
 import { useUser } from '@clerk/clerk-expo';
 import { useNavigation } from '@react-navigation/native';
@@ -40,7 +39,6 @@ const Room = ({ route }) => {
             console.error("Error fetching default furnitures:", error);
         };
     };
-
     const navigation = useNavigation();
     const goToFurniture = (item) => {
       if (item) {

@@ -1,24 +1,68 @@
 import { useUser } from '@clerk/clerk-expo';
-import React from 'react';
+import React, { useState } from 'react';
 import { Text, View, Button, Modal, StyleSheet, Dimensions, TouchableOpacity, Image, FlatList } from 'react-native';
+import ImageAPI from '../../API/ImageAPI';
 import Header from '../HomeScreen/Header';
-import { AntDesign } from '@expo/vector-icons';
+import ItemForm from './Forms/ItemForm';
+import * as MediaLibrary from 'expo-media-library';
 
 const { width } = Dimensions.get('window');
 const imageWidth = width / 2;
 const Furniture = ({ route }) => {
     const { user, isLoading } = useUser();
     const [items, setItems] = React.useState([]);
-    const [showModal, setShowModal] = React.useState(false);
+    const [image, setImage]=useState({uri:null,id:''});
+    const [isNewItemAdditionLoading,setIsNewItemAdditionLoading]=useState(false)
+    const [newItemName,setNewItemName]=useState('')
+    const [brandName, setBrandName]=useState('')
+    const[newItemSize,setNewItemSize]=useState('')
+    
+    const [isAddingNewItem,setIsAddingNewItem]=useState(false)
 
-    const handleAddItem = () => {
-        setShowModal(true);
+    console.log(route)
+
+
+    const handleAddItem = async () => {
+        setIsNewItemAdditionLoading(true);
+    
+        const assetInfo = await MediaLibrary.getAssetInfoAsync(image.id);
+
+        console.log("Assets info",assetInfo)
+        const localUri = assetInfo.localUri;
+
+        // Create the imageFile object with the local file URI
+        const imageFile = {
+            uri: localUri,
+            type: 'image/jpeg',
+            name: `${user.firstName}${route.params?.selectedItem.name.trim().toLowerCase()}${newItemName.trim().toLowerCase()}${Date.now().toString()}.jpg`,
+        };
+    
+        
+        try {
+            console.log("imageFile", imageFile);
+            const imageFromCamera = await ImageAPI.uploadImageAPI(imageFile);
+        
+            let data = {
+                id: items.length + 1,
+                name: newItemName,
+                image: imageFromCamera.url, // Assuming the API returns the URL of the uploaded image
+                Brand: brandName
+            };
+    
+            setItems([...items, data]);
+        } catch (error) {
+            console.error('Error uploading image:', error);
+            // Handle error here
+        } finally {
+            setIsNewItemAdditionLoading(false);
+            setIsAddingNewItem(false);
+            setImage(null);
+            setBrandName('')
+            setNewItemName('')
+            setNewItemSize('')
+        }
     };
-
-    const handleCloseModal = () => {
-        setShowModal(false);
-    };
-
+    
     const renderItems = () => {
         if (items.length === 0) {
             return (
@@ -83,15 +127,21 @@ const Furniture = ({ route }) => {
             {!isLoading && (
             <View style={styles.container}>
                 {renderItems()}
-            <Button title="Add New Item" onPress={handleAddItem} />
-            <Modal visible={showModal} animationType="slide">
-                <View style={styles.modalContainer}>
-                    <Text style={styles.modalHeading}>Add New Item</Text>
-                    <TouchableOpacity style={[styles.closeButton]} onPress={handleCloseModal}>
-                            <Text style={styles.closeButtonText}><AntDesign name="close" size={24} color="red" /></Text>
-                        </TouchableOpacity>                
-                        </View>
-            </Modal>
+            <Button title="Add New Item" onPress={()=>setIsAddingNewItem(true)} />
+            <ItemForm isNewItemAdditionLoading={isNewItemAdditionLoading}
+            furnitureType={route.params?.selectedItem.name}
+            image={image}
+            setImage={setImage}
+            isAddingNewItem={isAddingNewItem}
+            setIsAddingNewItem={setIsAddingNewItem}
+            newItemName={newItemName}
+            setNewItemName={setNewItemName}
+            handleAddItem={handleAddItem}
+            brandName={brandName}
+            setBrandName={setBrandName}
+            newItemSize={newItemSize}
+            setNewItemSize={setNewItemSize}
+            />
         </View>)}
         </View>
     );
