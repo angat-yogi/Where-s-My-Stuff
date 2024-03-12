@@ -5,7 +5,6 @@ const IMAGE_URL='https://wms-image-bg-remover-api-a8fc745d4eab.herokuapp.com/get
 
 async function getFormattedImage(formData) {
   if(!formData){
-    console.log("form data empty, returning back")
     return;
   }
     try {
@@ -43,8 +42,6 @@ async function uploadImageAPI(file) {
   });
 
   try {
-      console.log("uploading asset", file, form);
-
       const response = await fetch(`${URL}`, {
           method: 'POST',
           headers: {

@@ -89,17 +89,13 @@ const ItemForm = ({ isNewItemAdditionLoading,furnitureType, image, isAddingNewIt
                 // Save the image to the WMS album
                 const asset = await MediaLibrary.createAssetAsync(temporaryFilePath);
                 await MediaLibrary.addAssetsToAlbumAsync([asset], album, false);
-    
-                // console.log('Image saved to gallery successfully',asset);
-    
+        
                 const assets = await MediaLibrary.getAssetsAsync({ album: album, sortBy: ['creationTime'], sortOrder: 'desc' });
     
                 if (assets.assets.length > 0) {
                     // Set the URI of the most recent asset as the image URI
                     setImage({ uri: assets.assets[0].uri, id: assets.assets[0].id });
-                }
-                console.log("image", image);
-    
+                }    
             } catch (error) {
                 // Handle errors
                 console.error(error);

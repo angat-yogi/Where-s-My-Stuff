@@ -9,6 +9,7 @@ export const SharedStateProvider = ({ children }) => {
         allFurnitures: [],
         selectedRooms: [],
         error: false,
+        users:[]
         // Other relevant state variables
     });
 

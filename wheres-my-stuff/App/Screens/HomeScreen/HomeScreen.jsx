@@ -13,7 +13,6 @@ export default function HomeScreen() {
   const [rooms,setRooms]=useState([]);
   const { sharedState, setSharedState } = useSharedState();
   const { user, isLoading } = useUser();
-console.log("rooms from state",sharedState.selectedRooms)
 const getRooms = () => {
   try{
   GlobalApi.getDefaultRooms().then(async (resp) => {

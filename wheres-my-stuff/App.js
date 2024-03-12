@@ -7,7 +7,6 @@ import TabNavigator from './App/Navigations/TabNavigator';
 import { NavigationContainer } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-
 import ProfileNavigator from './App/Navigations/ProfileNavigator';
 import { SharedStateProvider } from './App/State/SharedStateProvider';
 
@@ -39,6 +38,9 @@ export default function App() {
     'outfit-bold': require('./assets/fonts/Outfit-Bold.ttf'),
     ProtestRiot: require('./assets/fonts/ProtestRiot-Regular.ttf'),
   });
+  
+
+  
 
   return (
     <SafeAreaProvider>
