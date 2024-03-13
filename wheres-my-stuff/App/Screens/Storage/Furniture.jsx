@@ -56,7 +56,7 @@ const Furniture = ({ route }) => {
         } finally {
             setIsNewItemAdditionLoading(false);
             setIsAddingNewItem(false);
-            setImage(null);
+            setImage({uri:null,id:''});
             setBrandName('')
             setNewItemName('')
             setNewItemSize('')

@@ -18,7 +18,7 @@ const ItemForm = ({ isNewItemAdditionLoading,furnitureType, image, isAddingNewIt
     const { user, isLoading } = useUser();
     const [isFormComplete, setIsFormComplete] = useState(false);
     const ALBUM_NAME = 'WMS';
-    const [isImageLoading,setIsImageLoading]=useState(false)
+    const [isImageLoading,setIsImageLoading]=useState(null)
 
     const requestPermissions = async () => {
         // Request media library permission
@@ -66,7 +66,7 @@ const ItemForm = ({ isNewItemAdditionLoading,furnitureType, image, isAddingNewIt
                 }
                 const url = URL.createObjectURL(blob);
     
-                setImage({ uri: url, id: assets.assets[0].id });
+                setImage({ uri: url, id: '' });
                 setIsImageLoading(false)
     
                 // Create a temporary file path to save the image
@@ -92,6 +92,7 @@ const ItemForm = ({ isNewItemAdditionLoading,furnitureType, image, isAddingNewIt
         
                 const assets = await MediaLibrary.getAssetsAsync({ album: album, sortBy: ['creationTime'], sortOrder: 'desc' });
     
+                console.log("assets",assets)
                 if (assets.assets.length > 0) {
                     // Set the URI of the most recent asset as the image URI
                     setImage({ uri: assets.assets[0].uri, id: assets.assets[0].id });
@@ -107,7 +108,6 @@ const ItemForm = ({ isNewItemAdditionLoading,furnitureType, image, isAddingNewIt
     }
     
     const pickImages = async () => {
-        setImage({ uri: null, id: null });
         try {
             let result = await ImagePicker.launchImageLibraryAsync({
                 mediaTypes: ImagePicker.MediaTypeOptions.Images,
@@ -124,7 +124,6 @@ const ItemForm = ({ isNewItemAdditionLoading,furnitureType, image, isAddingNewIt
     }
     
     const takePicture = async () => {
-        setImage({ uri: null, id: null });
         try {
             let result = await ImagePicker.launchCameraAsync({
                 cameraType: ImagePicker.CameraType.back,
@@ -154,7 +153,7 @@ const ItemForm = ({ isNewItemAdditionLoading,furnitureType, image, isAddingNewIt
         });
       };
 
-    const addButtonStyle = isFormComplete ? styles.addButton : [styles.addButton, styles.disabledButton];
+    const addButtonStyle = isFormComplete && isImageLoading===false ? styles.addButton : [styles.addButton, styles.disabledButton];
     const disabledButtonStyle = {
         backgroundColor: '#ccc', // Grey background color
     };
@@ -219,7 +218,7 @@ const ItemForm = ({ isNewItemAdditionLoading,furnitureType, image, isAddingNewIt
                                 <FontAwesome name="files-o" size={30} color={Colors.BEIGE} style={{ marginHorizontal: 10 }} />
                             </TouchableOpacity>
                         </View>
-                        <TouchableOpacity style={isFormComplete ? addButtonStyle : [addButtonStyle, disabledButtonStyle]} onPress={handleAddItem} disabled={!isFormComplete||isNewItemAdditionLoading}>
+                        <TouchableOpacity style={isFormComplete&& isImageLoading===false ? addButtonStyle : [addButtonStyle, disabledButtonStyle]} onPress={handleAddItem} disabled={!isFormComplete||isNewItemAdditionLoading|| !isImageLoading===false}>
                         {isNewItemAdditionLoading ? ( // Render spinner if isNewRoomAdditionLoading is true
                                 <ActivityIndicator size="small" color="white" />
                             ) : (
