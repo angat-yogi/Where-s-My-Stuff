@@ -57,8 +57,8 @@ const Furniture = ({ route }) => {
             await GlobalApi.addItemToFurniture(data).then(async(resp)=>{
                 console.log("added item to the fuurniture",resp)
             })
-            
-            setItems([...items, data]);
+            await fetchItems();
+            //setItems([...items, data]);
         } catch (error) {
             console.error('Error uploading image:', error);
             // Handle error here
