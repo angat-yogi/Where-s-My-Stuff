@@ -5,6 +5,7 @@ import ImageAPI from '../../API/ImageAPI';
 import Header from '../HomeScreen/Header';
 import ItemForm from './Forms/ItemForm';
 import * as MediaLibrary from 'expo-media-library';
+import GlobalApi from '../../API/GlobalApi';
 
 const { width } = Dimensions.get('window');
 const imageWidth = width / 2;
@@ -18,7 +19,7 @@ const Furniture = ({ route }) => {
     const[newItemSize,setNewItemSize]=useState('')
     
     const [isAddingNewItem,setIsAddingNewItem]=useState(false)
-
+  
     console.log(route)
 
 
@@ -41,14 +42,22 @@ const Furniture = ({ route }) => {
         try {
             console.log("imageFile", imageFile);
             const imageFromCamera = await ImageAPI.uploadImageAPI(imageFile);
-        
+    
             let data = {
                 id: items.length + 1,
                 name: newItemName,
                 image: imageFromCamera.url, // Assuming the API returns the URL of the uploaded image
-                Brand: brandName
+                brand: brandName,
+                room:route.params.room,
+                email:user.emailAddresses[0].emailAddress,
+                furniture:route.params.selectedItem.name,
+                size:newItemSize
             };
-    
+
+            await GlobalApi.addItemToFurniture(data).then(async(resp)=>{
+                console.log("added item to the fuurniture",resp)
+            })
+            
             setItems([...items, data]);
         } catch (error) {
             console.error('Error uploading image:', error);
@@ -85,9 +94,9 @@ const Furniture = ({ route }) => {
                         </TouchableOpacity>  
                         <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
                             <Text style={styles.itemName}>{item.name}</Text>
-                            <Text style={styles.brandName}> by {item.Brand}</Text>
+                            <Text style={styles.brandName}> by {item.brand}</Text>
                         </View>
-                        <Text style={styles.dateAdded}>Date Added: {new Date().toLocaleDateString()}</Text>         
+                        <Text style={styles.dateAdded}>Date Added: {item.updatedAt.substring(0, 10)}</Text>         
                         
                     </View>
                     )}
@@ -97,23 +106,25 @@ const Furniture = ({ route }) => {
         }
     };
 
-    const fetchItems = () => {
-        // Simulate fetching items from an API
-        setItems([
-            { id: 1, name: 'Item 1',image:"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR0UsM005bdou1Rapcc2SnoB18QV_qn2N8zuBqyZtLm2PnalZGLdfZSRlTkbsUCylhiDLM&usqp=CAU", Brand:"Adidas"},
-            { id: 2, name: 'Item 2',image:"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcREZE9thU7-aMlgaNRkJbTOqHAhL6-d1h3vig&usqp=CAU", Brand:"Target"},
-            { id: 3, name: 'Item 3',image:"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTHtP8h1QiTizDs8YaUp8hXYH3oEUmpyCmACJUPIIJZSdsjbH3JuhdQxRd5NEOQT_OgEeA&usqp=CAU", Brand:"Puma"},
-            { id: 4, name: 'Item 4', image:"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR0UsM005bdou1Rapcc2SnoB18QV_qn2N8zuBqyZtLm2PnalZGLdfZSRlTkbsUCylhiDLM&usqp=CAU",Brand:"Nike" },
-            { id: 5, name: 'Crop Top',image:"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR0UsM005bdou1Rapcc2SnoB18QV_qn2N8zuBqyZtLm2PnalZGLdfZSRlTkbsUCylhiDLM&usqp=CAU", Brand:"Adidas"},
-            { id: 6, name: 'Short',image:"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcREZE9thU7-aMlgaNRkJbTOqHAhL6-d1h3vig&usqp=CAU", Brand:"Nike"},
-            { id: 7, name: 'Light Pant',image:"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTHtP8h1QiTizDs8YaUp8hXYH3oEUmpyCmACJUPIIJZSdsjbH3JuhdQxRd5NEOQT_OgEeA&usqp=CAU", Brand:"Roshan"},
-            { id: 8, name: 'Item 4', image:"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR0UsM005bdou1Rapcc2SnoB18QV_qn2N8zuBqyZtLm2PnalZGLdfZSRlTkbsUCylhiDLM&usqp=CAU",Brand:"Nike" },
-            { id: 9, name: 'Item 1',image:"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR0UsM005bdou1Rapcc2SnoB18QV_qn2N8zuBqyZtLm2PnalZGLdfZSRlTkbsUCylhiDLM&usqp=CAU", Brand:"Lulu"},
-            { id: 10, name: 'Item 2',image:"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcREZE9thU7-aMlgaNRkJbTOqHAhL6-d1h3vig&usqp=CAU", Brand:"Adidas"},
-            { id: 11, name: 'Item 3',image:"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTHtP8h1QiTizDs8YaUp8hXYH3oEUmpyCmACJUPIIJZSdsjbH3JuhdQxRd5NEOQT_OgEeA&usqp=CAU", Brand:"Nike"},
-            { id: 12, name: 'Item 4', image:"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR0UsM005bdou1Rapcc2SnoB18QV_qn2N8zuBqyZtLm2PnalZGLdfZSRlTkbsUCylhiDLM&usqp=CAU",Brand:"Nike" },
-            // Add other items as needed
-        ]);
+    const fetchItems = async () => {
+
+        let data = {
+            room:route.params.room,
+            email:user.emailAddresses[0].emailAddress,
+            furniture:route.params.selectedItem.name,
+        };
+
+        await GlobalApi.getRoomFurnitureItems(data).then(async (resp) => {
+            console.log("resp", resp.furnitureItems);
+            
+            // Filter out items that already exist in the items state
+            const newItems = resp.furnitureItems.filter((item) => {
+              return !items.some((existingItem) => existingItem.id === item.id);
+            });
+            
+            // Concatenate the new items with the existing items state
+            setItems([...items, ...newItems]);
+          });
     };
 
     React.useEffect(() => {

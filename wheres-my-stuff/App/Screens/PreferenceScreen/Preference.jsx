@@ -28,7 +28,7 @@ const Preference = () => {
     const [selectedRoomType, setSelectedRoomType] = useState(null);
     const [isNewRoomAdditionLoading, setIsNewRoomAdditionLoading] = useState(false);
     const { sharedState, setSharedState } = useSharedState();
-
+    const [reloadPage,setReloadPage]=useState(false)
     const getFurnitures = async () => {
         try {
             const resp = await GlobalApi.getDefaultFurnitures();
@@ -106,7 +106,8 @@ const Preference = () => {
                         text: "OK",
                         onPress: ()=> {
                             setModalVisible(false);
-                            navigation.navigate("Go Back");
+                            setReloadPage(true)
+                            navigation.navigate("home",{refresh:reloadPage});
                         }
                     },
                 ],
@@ -171,7 +172,7 @@ const Preference = () => {
             setSkip(true);
         }
         if (skip && selectedRooms.length === 0) {
-            navigation.navigate('Go Back');
+            navigation.navigate('home',{refresh:reloadPage});
         } else {
             setRoomSelectionCompleted(true);
             setSharedState(prevState => ({

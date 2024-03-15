@@ -42,7 +42,7 @@ const Room = ({ route }) => {
     const navigation = useNavigation();
     const goToFurniture = (item) => {
       if (item) {
-        navigation.navigate('furniture',{selectedItem:item})    } else {
+        navigation.navigate('furniture',{selectedItem:item, room:route.params.selectedItem.roomType})    } else {
         return;
       }
     };

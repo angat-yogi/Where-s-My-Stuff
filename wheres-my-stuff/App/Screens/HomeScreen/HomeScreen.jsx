@@ -6,7 +6,7 @@ import GlobalApi from "../../API/GlobalApi";
 import { useUser } from "@clerk/clerk-expo";
 import { useSharedState } from "../../State/SharedStateProvider";
 
-export default function HomeScreen() {
+export default function HomeScreen({route}) {
   const [categories, setCategories] = useState();
   const [fashions, setFashions] = useState();
   const [storageTypes, setStorageTypes] = useState();
@@ -66,7 +66,7 @@ const getRooms = () => {
     getCategories();
     getTrendingFashions();
     getStorageTypes();
-  }, []);
+  }, [route.params?.refresh]);
   return (
     <ScrollView onScroll={handleScroll}
     scrollEventThrottle={16} // Adjust scrollEventThrottle as needed

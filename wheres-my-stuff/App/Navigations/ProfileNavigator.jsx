@@ -76,17 +76,19 @@ if (loading) {
            component={Preference}
          />
          <Drawer.Screen
-           name="Go Back"
+           name="home"
            options={{ drawerLabel: () => null }}
            component={TabNavigator}
+           initialParams={{ refresh:true }}
          />
        </>
       ) : (
         <>
         <Drawer.Screen
-           name="Go Back"
+           name="home"
            options={{ drawerLabel: () => null }}
            component={TabNavigator}
+           initialParams={{ refresh:true }}
          />
          <Drawer.Screen
          name="Preference"

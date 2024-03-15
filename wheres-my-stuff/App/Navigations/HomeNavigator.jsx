@@ -13,7 +13,7 @@ const Stack = createStackNavigator();
 export default function HomeNavigator() {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="home" component={HomeScreen} />
+      <Stack.Screen name="home" component={HomeScreen} initialParams={{refresh:true}}/>
       <Stack.Screen name="closet" component={Closet} />
       <Stack.Screen name="gallery" component={Gallery} />
       <Stack.Screen name="Camera" component={CameraComponent} />

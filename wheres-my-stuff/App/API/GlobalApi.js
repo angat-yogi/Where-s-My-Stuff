@@ -276,6 +276,43 @@ return result;
 };
 
 
+
+const addItemToFurniture =async (data)=>{
+  let result;
+
+  const mutationQuery = gql`
+  mutation AddItemToFurniture {
+    createFurnitureItem(
+      data: {
+        userEmail: "${data.email}", 
+        name: "${data.name}", 
+        image: "${data.image}", 
+        room: "${data.room}", 
+        furniture: "${data.furniture}", 
+        brand: "${data.brand}", 
+        size: ${data.size}
+      })
+      {
+        id
+      }
+      publishManyFurnitureItems{
+        count
+      }
+  }
+
+
+  `;
+try {
+  result = await request(URL, mutationQuery);
+} catch (error) {
+  console.error("error on api:", error);
+
+}
+return result;
+};
+
+
+
 const addFurniture =async (data)=>{
   let result;
 
@@ -378,6 +415,42 @@ try {
 }
 return result;
 };
+
+
+
+
+const getRoomFurnitureItems = async (data) => {
+  let result;
+  const query = gql`
+  query GetFurnitureItemImage {
+    furnitureItems(
+      where: { 
+      furniture_contains: "${data.furniture}", 
+      room: "${data.room}", 
+      userEmail: "${data.email}"}
+    ) {
+      brand
+      furniture
+      id
+      image
+      name
+      room
+      size
+      userEmail
+      updatedAt
+    }
+  }
+  
+  `;
+  try {
+    result = await graphQLClient.request(query);
+  } catch (error) {
+    console.error("error on api:", error);
+  }
+  return result;
+};
+
+
 
 const getUserFurnitures = async () => {
   let result;
@@ -532,5 +605,7 @@ export default {
   addUserInitialOldRooms,
   addUserInitialNewRooms,
   getUserFurnitures,
-  addFurniture
+  addFurniture,
+  addItemToFurniture,
+  getRoomFurnitureItems
 };
