@@ -6,6 +6,7 @@ import Header from '../HomeScreen/Header';
 import ItemForm from './Forms/ItemForm';
 import * as MediaLibrary from 'expo-media-library';
 import GlobalApi from '../../API/GlobalApi';
+import Colors from '../../Utils/Colors';
 
 const { width } = Dimensions.get('window');
 const imageWidth = width / 2;
@@ -138,7 +139,10 @@ const Furniture = ({ route }) => {
             {!isLoading && (
             <View style={styles.container}>
                 {renderItems()}
-            <Button title="Add New Item" onPress={()=>setIsAddingNewItem(true)} />
+            <TouchableOpacity style={styles.addButton} onPress={()=>setIsAddingNewItem(true)}>
+                <Text style={styles.addButtonText}>+ Item</Text>
+            </TouchableOpacity>
+
             <ItemForm isNewItemAdditionLoading={isNewItemAdditionLoading}
             furnitureType={route.params?.selectedItem.name}
             image={image}
@@ -224,6 +228,20 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         fontSize: 14,
         color: 'gray',
+    },
+    addButton: {
+        backgroundColor: Colors.PRIMARY,
+        borderRadius: 10,
+        paddingVertical: 12,
+        paddingHorizontal: 24,
+        marginTop: 20,
+        alignSelf: 'center',
+    },
+    addButtonText: {
+        color: 'white',
+        fontSize: 16,
+        fontWeight: 'bold',
+        textAlign: 'center',
     },
 });
 
