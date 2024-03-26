@@ -70,9 +70,11 @@ const getRooms = () => {
   return (
     <ScrollView onScroll={handleScroll}
     scrollEventThrottle={16} // Adjust scrollEventThrottle as needed
-    refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}contentContainerStyle={styles.scrollViewContent}>
+    refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}contentContainerStyle={styles.scrollViewContent}
+    showsVerticalScrollIndicator={false}
+    >
       <Header icon="camera" action="Camera" />
-      <View style={{ padding: 20 }}>
+      <View style={{ padding: 7 }}>
         <Slider
           isViewAll={true}
           displayHeading={true}
@@ -80,18 +82,19 @@ const getRooms = () => {
           data={categories}
           styleImage={styles.imageCategory}
         />
-        <Slider
-          isViewAll={false}
-          displayHeading={true}
-          heading="Trending Fashions"
-          data={sortedFashions}
-          styleImage={styles.imageFashion}
-        />
+
         <Slider
           // isViewAll={false}
           plus={true}
           heading="Rooms"
           data={rooms}
+          styleImage={styles.imageFashion}
+        />
+                <Slider
+          isViewAll={false}
+          displayHeading={true}
+          heading="Trending Fashions"
+          data={sortedFashions}
           styleImage={styles.imageFashion}
         />
       </View>

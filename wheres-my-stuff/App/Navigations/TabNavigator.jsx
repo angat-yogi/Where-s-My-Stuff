@@ -12,6 +12,7 @@ import { MaterialIcons } from "@expo/vector-icons";
 import FavoriteScreen from "../Screens/Favorite/FavoriteScreen";
 import HomeNavigator from "./HomeNavigator";
 import ToDoScreenNavigator from "./ToDoScreenNavigator";
+import StyleScreen from "../Screens/Style/StyleScreen";
 
 const Tab = createBottomTabNavigator();
 
@@ -52,6 +53,15 @@ const TabNavigator = () => {
         options={{
           tabBarIcon: ({ color, size }) => (
             <MaterialIcons name="favorite" size={size} color={color} />
+          ),
+        }}
+      />
+      <Tab.Screen
+        name="Style"
+        component={StyleScreen}
+        options={{
+          tabBarIcon: ({ color, size }) => (
+            <MaterialCommunityIcons name="wardrobe-outline" size={size} color={color} />
           ),
         }}
       />

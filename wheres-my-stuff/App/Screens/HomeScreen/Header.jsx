@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   TextInput,
   Modal,
+  FlatList,
 } from "react-native";
 import React, { useState } from "react";
 import { useUser } from "@clerk/clerk-expo";
@@ -14,12 +15,16 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { FontAwesome } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import Logo from "../../Shared/Logo";
+import { useSharedState } from "../../State/SharedStateProvider";
 
 export default function Header({ style, shouldDisplayProfile, icon, action, displayName }) {
   const { user, isLoading } = useUser();
   const navigation = useNavigation();
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedOption, setSelectedOption] = useState(null);
+  const [searchResults, setSearchResults] = useState([]);
+  const { sharedState, setSharedState } = useSharedState();
+  const [searchQuery, setSearchQuery] = useState("");
 
   const handleProfilePress = () => {
     navigation.openDrawer();
@@ -31,6 +36,12 @@ export default function Header({ style, shouldDisplayProfile, icon, action, disp
 
   const closeModal = () => {
     setIsModalVisible(false);
+  };
+
+  const handleSearch = () => {
+    
+    const apiSearchResults = []; // Placeholder for API search results
+    setSearchResults(apiSearchResults);
   };
 
   const handleOptionSelect = (option) => {
@@ -81,8 +92,8 @@ export default function Header({ style, shouldDisplayProfile, icon, action, disp
         </View>
         {/* Search Section */}
         <View style={styles.searchContainer}>
-          <TextInput placeholder="Search" style={styles.textInput} />
-          <TouchableOpacity>
+          <TextInput placeholder="Search" style={styles.textInput}  onChangeText={(text) => setSearchQuery(text)} />
+          <TouchableOpacity onPress={handleSearch}>
             <MaterialCommunityIcons
               style={styles.searchButton}
               name="archive-search"
@@ -91,8 +102,8 @@ export default function Header({ style, shouldDisplayProfile, icon, action, disp
             />
           </TouchableOpacity>
         </View>
-
-        {/* Modal for the action */}
+ 
+       
         <Modal visible={isModalVisible} animationType="slide" onRequestClose={closeModal}>
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
@@ -119,10 +130,11 @@ export default function Header({ style, shouldDisplayProfile, icon, action, disp
   );
 }
 
+
 const styles = StyleSheet.create({
   container: {
     padding: 20,
-    paddingTop: 40,
+    paddingTop: 20,
     backgroundColor: Colors.PRIMARY,
     borderBottomLeftRadius: 5,
     borderBottomRightRadius: 25,
