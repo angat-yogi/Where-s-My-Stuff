@@ -8,6 +8,7 @@ import ClothForm from "../Screens/Storage/Closet/ClothForm";
 import Gallery from "../Shared/Gallery";
 import Room from "../Screens/HomeScreen/Room/Room";
 import Furniture from "../Screens/Storage/Furniture";
+import ShareMyStuffs from "../Screens/ShareMyStuffs/ShareMyStuffs";
 
 const Stack = createStackNavigator();
 export default function HomeNavigator() {
@@ -20,8 +21,7 @@ export default function HomeNavigator() {
       <Stack.Screen name="clothform" component={ClothForm} />
       <Stack.Screen name="room" component={Room} />
       <Stack.Screen name="furniture" component={Furniture} />
-
-
+      <Stack.Screen name="Share" component={ShareMyStuffs} />
     </Stack.Navigator>
   );
 }

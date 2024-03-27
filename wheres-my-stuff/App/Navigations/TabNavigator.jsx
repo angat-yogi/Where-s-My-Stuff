@@ -13,7 +13,8 @@ import FavoriteScreen from "../Screens/Favorite/FavoriteScreen";
 import HomeNavigator from "./HomeNavigator";
 import ToDoScreenNavigator from "./ToDoScreenNavigator";
 import StyleScreen from "../Screens/Style/StyleScreen";
-
+import { FontAwesome6 } from '@expo/vector-icons';
+import ShareMyStuffs from "../Screens/ShareMyStuffs/ShareMyStuffs";
 const Tab = createBottomTabNavigator();
 
 const TabNavigator = () => {
@@ -65,6 +66,16 @@ const TabNavigator = () => {
           ),
         }}
       />
+
+      <Tab.Screen
+        name="Share"
+        component={ShareMyStuffs}
+        options={{
+          tabBarIcon: ({ color, size }) => (
+            <FontAwesome6 name="slideshare" size={size} color={color} />
+          ),
+        }}
+      />    
     </Tab.Navigator>
   );
 };
