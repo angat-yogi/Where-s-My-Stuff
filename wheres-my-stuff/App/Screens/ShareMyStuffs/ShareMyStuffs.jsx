@@ -1,13 +1,23 @@
 import React, { useState } from 'react';
-import { View, Text, FlatList, Image, TextInput, Button, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, FlatList, Image, TextInput, Button, TouchableOpacity, StyleSheet,Share } from 'react-native';
 import { Entypo } from '@expo/vector-icons';
 import { AntDesign } from '@expo/vector-icons';
 import { FontAwesome6 } from '@expo/vector-icons';
+
 export default function ShareMyStuffs() {
     const [comments, setComments] = useState([]);
     const [newComment, setNewComment] = useState('');
     const [likedPosts, setLikedPosts] = useState(new Set());
+    const share = async (imageUrl)=> {
 
+        try {
+         await Share.share({
+                message: imageUrl,
+            })
+        } catch (error) {
+            
+        }
+      }
     // Dummy data for images with comments
     const images = [
         { 
@@ -18,7 +28,7 @@ export default function ShareMyStuffs() {
         { 
             id: 2, 
             imageUrl: 'https://www.decorilla.com/online-decorating/wp-content/uploads/2022/10/Different-interior-design-styles-in-a-chic-interior-by-Jatnna-M.jpg', 
-            comments: ['Amazing'] 
+            comments: ['Wow'] 
         },
         { 
             id: 3, 
@@ -75,7 +85,7 @@ export default function ShareMyStuffs() {
         setLikedPosts(new Set(likedPosts)); // Force re-render by updating state
     };
     const handleSharePost=(id)=>{
-
+        share();
     }
 
     const isPostLiked = (postId) => {
@@ -99,7 +109,7 @@ export default function ShareMyStuffs() {
                                 {isPostLiked(item.id) ? <FontAwesome6 name="heart-circle-check" size={24} color="red" />: <FontAwesome6 name="heart-circle-xmark" size={24} color="black" />}
                             </Text>
                         </TouchableOpacity>
-                        <TouchableOpacity onPress={() => handleSharePost(item.id)}>
+                        <TouchableOpacity onPress={() => share(item.imageUrl)}>
                             <Text style={[styles.actionText, { color: 'black' }]}>
                             <Entypo name="share" size={20} color="black" />
                             </Text>
