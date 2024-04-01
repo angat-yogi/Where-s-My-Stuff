@@ -57,10 +57,10 @@ export default function Slider({ data, heading, isViewAll,plus, styleImage,displ
               style={{ marginRight: 20, alignItems: "center" }}
             >
               <Text style={styles.categoryName}>
-                {item.name || item.storageTypeName||item.roomDisplayName}
-              </Text>
+              {item.name ? (item.name.split(' ').length > 2 ? `${item.name.split(' ')[0]} ${item.name.split(' ')[1]}...` : item.name) : (item.storageTypeName || item.roomDisplayName)}
+            </Text>
               <Image
-                style={styleImage}
+                style={[styleImage,{resizeMode: 'contain'}]}
                 source={{
                   uri:
                   item.imageUri||

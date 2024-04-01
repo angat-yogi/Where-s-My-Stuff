@@ -1,5 +1,5 @@
-import React from "react";
-import { View, Text, StyleSheet } from "react-native";
+import React, { useState } from "react";
+import { View, Text, StyleSheet, TextInput, Button, TouchableOpacity } from "react-native";
 import Header from "../HomeScreen/Header";
 import Slider from "../HomeScreen/Slider";
 import { SwipeListView } from "react-native-swipe-list-view";
@@ -7,19 +7,20 @@ import { FontAwesome } from "@expo/vector-icons";
 
 export default function ToDoScreen() {
   // Sample data for demonstration
-  const todos = [
-    { id: 1, title: "Task 1", completed: false, dueDate: new Date() },
+  const [newTodo, setNewTodo] = useState("");
+  const [todos, setTodos] = useState([
+    { id: 1, title: "Task 123", completed: false, dueDate: new Date() },
     {
       id: 2,
       title: "Task 2",
       completed: true,
-      dueDate: new Date("2024-02-15"),
+      dueDate: new Date("2024-04-15"),
     },
     {
       id: 3,
       title: "Task 3",
       completed: false,
-      dueDate: new Date("2024-02-27"),
+      dueDate: new Date("2024-05-27"),
     },
     {
       id: 4,
@@ -33,7 +34,7 @@ export default function ToDoScreen() {
       completed: false,
       dueDate: new Date("2024-03-01"),
     },
-  ];
+  ]);
 
   // Function to check if two dates are on the same day
   const isSameDay = (date1, date2) => {
@@ -72,15 +73,42 @@ export default function ToDoScreen() {
   };
 
   // Function to render hidden items for swipe actions
-  const renderHiddenItem = (data, rowMap, swipedRight) => (
-    <View style={styles.hiddenContainer}>
-      {swipedRight ? (
+const renderHiddenItem = (data, rowMap, swipedRight) => (
+  <View style={styles.hiddenContainer}>
+    {swipedRight ? (
+      <TouchableOpacity
+        onPress={() => handleMarkAsDone(data.item.id)}
+        style={[styles.hiddenButton, styles.doneButton]}
+      >
         <FontAwesome name="check" size={24} color="green" />
-      ) : (
-        <FontAwesome name="times" size={24} color="red" />
-      )}
-    </View>
+      </TouchableOpacity>
+    ) : (
+      <FontAwesome name="times" size={24} color="red" />
+    )}
+  </View>
+);
+
+// Function to handle marking a to-do as done
+const handleMarkAsDone = (id) => {
+  const updatedTodos = todos.map((todo) =>
+    todo.id === id ? { ...todo, completed: true } : todo
   );
+  setTodos(updatedTodos);
+};
+
+  // Function to handle adding new to-do item
+  const handleAddTodo = () => {
+    if (newTodo.trim() !== "") {
+      const newTodoItem = {
+        id: todos.length + 1,
+        title: newTodo,
+        completed: false,
+        dueDate: new Date(),
+      };
+      setTodos([...todos, newTodoItem]);
+      setNewTodo("");
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -88,6 +116,17 @@ export default function ToDoScreen() {
       <View style={styles.sliderContainer}>
         <Slider />
       </View>
+      {/* Input field to add new to-do */}
+      <View style={styles.inputContainer}>
+        <TextInput
+          style={styles.input}
+          placeholder="Add new to-do"
+          value={newTodo}
+          onChangeText={setNewTodo}
+        />
+        <Button title="Add" onPress={handleAddTodo} />
+      </View>
+      {/* Today tasks */}
       <View style={styles.sectionContainer}>
         <Text style={styles.sectionTitle}>Today:</Text>
         <SwipeListView
@@ -104,6 +143,7 @@ export default function ToDoScreen() {
           rightOpenValue={-75}
         />
       </View>
+      {/* Upcoming tasks */}
       <View style={styles.sectionContainer}>
         <Text style={styles.sectionTitle}>Upcoming:</Text>
         <SwipeListView
@@ -120,6 +160,7 @@ export default function ToDoScreen() {
           rightOpenValue={-75}
         />
       </View>
+      {/* Past due tasks */}
       <View style={styles.sectionContainer}>
         <Text style={styles.sectionTitle}>Past Due:</Text>
         <SwipeListView
@@ -171,5 +212,18 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     padding: 20,
+  },
+  inputContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 15,
+    marginBottom: 10,
+  },
+  input: {
+    flex: 1,
+    marginRight: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: "#ccc",
+    fontSize: 16,
   },
 });

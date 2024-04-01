@@ -13,6 +13,7 @@ export default function HomeScreen({route}) {
   const [rooms,setRooms]=useState([]);
   const { sharedState, setSharedState } = useSharedState();
   const { user, isLoading } = useUser();
+  console.log("Shared State",sharedState)
 const getRooms = () => {
   try{
   GlobalApi.getDefaultRooms().then(async (resp) => {
@@ -88,6 +89,13 @@ const getRooms = () => {
           plus={true}
           heading="Rooms"
           data={rooms}
+          styleImage={styles.imageFashion}
+        />
+         <Slider
+          isViewAll={false}
+          displayHeading={true}
+          heading="Pending Items"
+          data={sharedState.pendingItems}
           styleImage={styles.imageFashion}
         />
                 <Slider
