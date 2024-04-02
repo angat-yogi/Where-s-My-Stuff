@@ -14,7 +14,7 @@ import { Camera } from 'expo-camera';
 import ImageAPI from '../../../API/ImageAPI';
 
 
-const ItemForm = ({ isNewItemAdditionLoading,furnitureType, image, isAddingNewItem, setNewItemName, setIsAddingNewItem, handleAddItem, newItemName, setImage,brandName, setBrandName,newItemSize,setNewItemSize}) => {
+const ItemForm = ({ isNewItemAdditionLoading,furnitureType, image, isAddingNewItem, setNewItemName, setIsAddingNewItem, handleAddItem, newItemName, setImage,brandName, setBrandName,newItemSize,setNewItemSize,isEdit,setIsEdit,editItem}) => {
     const { user, isLoading } = useUser();
     const [isFormComplete, setIsFormComplete] = useState(false);
     const ALBUM_NAME = 'WMS';
@@ -43,7 +43,13 @@ const ItemForm = ({ isNewItemAdditionLoading,furnitureType, image, isAddingNewIt
 
     useEffect(()=>{
         requestPermissions();
-    },[])
+        if (isEdit && editItem) {
+            setNewItemName(editItem.name || '');
+            setBrandName(editItem.brand || '');
+            setNewItemSize(editItem.size || '');
+            setImage({ uri: editItem.image || '', id: editItem.id || '' });
+        }
+    },[editItem,isEdit])
     const generateRandomString = () => {
         return Math.random().toString(36).substring(7);
     }
@@ -92,7 +98,6 @@ const ItemForm = ({ isNewItemAdditionLoading,furnitureType, image, isAddingNewIt
         
                 const assets = await MediaLibrary.getAssetsAsync({ album: album, sortBy: ['creationTime'], sortOrder: 'desc' });
     
-                console.log("assets",assets)
                 if (assets.assets.length > 0) {
                     // Set the URI of the most recent asset as the image URI
                     setImage({ uri: assets.assets[0].uri, id: assets.assets[0].id });
@@ -160,10 +165,10 @@ const ItemForm = ({ isNewItemAdditionLoading,furnitureType, image, isAddingNewIt
 
     return (
         <View>
-            <Modal visible={isAddingNewItem} animationType="slide" transparent>
+            <Modal visible={isAddingNewItem||isEdit} animationType="slide" transparent>
                 <View style={styles.modalBackground}>
                     <KeyboardAvoidingView style={styles.modalContent} behavior="padding">
-                        <Text style={styles.modalTitle}>Add New Item</Text>
+                        <Text style={styles.modalTitle}>{!isEdit?'Add new Item':'Edit Item'}</Text>
                         {
                             isImageLoading ? (
                                 <ActivityIndicator size="large" color="black" />
@@ -192,7 +197,7 @@ const ItemForm = ({ isNewItemAdditionLoading,furnitureType, image, isAddingNewIt
                         <TextInput
                             style={styles.input}
                             placeholder="Enter size"
-                            value={newItemSize}
+                            value={String(newItemSize)}
                             onChangeText={(text) => setNewItemSize(text)}
                         />
                         {/* <View style={styles.selectListContainer}>
@@ -219,14 +224,18 @@ const ItemForm = ({ isNewItemAdditionLoading,furnitureType, image, isAddingNewIt
                             </TouchableOpacity>
                         </View>
                         <TouchableOpacity style={isFormComplete&& isImageLoading===false ? addButtonStyle : [addButtonStyle, disabledButtonStyle]} onPress={handleAddItem} disabled={!isFormComplete||isNewItemAdditionLoading|| !isImageLoading===false}>
-                        {isNewItemAdditionLoading ? ( // Render spinner if isNewRoomAdditionLoading is true
-                                <ActivityIndicator size="small" color="white" />
-                            ) : (
-                                <Text style={styles.addButtonText}>Add {newItemName?`${newItemName} to ${furnitureType}`:'Item'}</Text>
-                            )}                        
+                        {isNewItemAdditionLoading ? (
+                            <ActivityIndicator size="small" color="white" />
+                        ) : (
+                            <Text style={styles.addButtonText}>
+                                {isEdit ? 'Save Changes' : `Add ${newItemName ? `${newItemName} to ${furnitureType}` : 'Item'}`}
+                            </Text>
+                            )}
                             </TouchableOpacity>
 
-                        <TouchableOpacity style={styles.closeButton} onPress={() => setIsAddingNewItem(false)}>
+                        <TouchableOpacity style={styles.closeButton} onPress={() => {
+                            setIsAddingNewItem(false) 
+                            setIsEdit(false)}}>
                             <Text style={styles.closeButtonText}>Close</Text>
                         </TouchableOpacity>
                     </KeyboardAvoidingView>

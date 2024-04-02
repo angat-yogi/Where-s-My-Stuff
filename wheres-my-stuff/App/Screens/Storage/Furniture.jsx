@@ -18,43 +18,56 @@ const Furniture = ({ route }) => {
     const [newItemName,setNewItemName]=useState('')
     const [brandName, setBrandName]=useState('')
     const[newItemSize,setNewItemSize]=useState('')
-    
+    const [editItem,setEditItem]=useState(null);
     const [isAddingNewItem,setIsAddingNewItem]=useState(false)
-  
+  const [isEdit,setIsEdit]=useState(false)
     console.log(route)
 
 
+    const EditItem=(item)=>{
+        setEditItem(item);
+        setIsEdit(true);
+        
+    }
     const handleAddItem = async () => {
         setIsNewItemAdditionLoading(true);
-    
-        const assetInfo = await MediaLibrary.getAssetInfoAsync(image.id);
+        let imageFile=null;
+        if(!image.uri.includes('https://')){
+            const assetInfo = await MediaLibrary.getAssetInfoAsync(image.id);
 
-        console.log("Assets info",assetInfo)
-        const localUri = assetInfo.localUri;
-
-        // Create the imageFile object with the local file URI
-        const imageFile = {
-            uri: localUri,
-            type: 'image/jpeg',
-            name: `${user.firstName}${route.params?.selectedItem.name.trim().toLowerCase()}${newItemName.trim().toLowerCase()}${Date.now().toString()}.jpg`,
-        };
+            console.log("Assets info",assetInfo)
+            const localUri = assetInfo.localUri;
     
-        
+            // Create the imageFile object with the local file URI
+             imageFile = {
+                uri: localUri,
+                type: 'image/jpeg',
+                name: `${user.firstName}${route.params?.selectedItem.name.trim().toLowerCase()}${newItemName.trim().toLowerCase()}${Date.now().toString()}.jpg`,
+            };
+        }
+           
         try {
             console.log("imageFile", imageFile);
-            const imageFromCamera = await ImageAPI.uploadImageAPI(imageFile);
+            let imageFromCamera =null;
+            if(!image.uri.includes('https://')){
+                imageFromCamera = await ImageAPI.uploadImageAPI(imageFile);
+                imageFromCamera=imageFromCamera.url;
+            }
+            else{
+                imageFromCamera=image.uri;
+            }
     
             let data = {
                 id: items.length + 1,
                 name: newItemName,
-                image: imageFromCamera.url, // Assuming the API returns the URL of the uploaded image
+                image: imageFromCamera, // Assuming the API returns the URL of the uploaded image
                 brand: brandName,
                 room:route.params.room,
                 email:user.emailAddresses[0].emailAddress,
                 furniture:route.params.selectedItem.name,
                 size:newItemSize
             };
-
+//update api to upsert
             await GlobalApi.addItemToFurniture(data).then(async(resp)=>{
                 console.log("added item to the fuurniture",resp)
             })
@@ -87,7 +100,7 @@ const Furniture = ({ route }) => {
                     keyExtractor={(item, index) => index.toString()}
                     renderItem={({ item }) => (
                     <View>
-                        <TouchableOpacity style={styles.imageContainer} onPress={()=>console.log('clicked on item',item)}>
+                        <TouchableOpacity style={styles.imageContainer} onPress={()=>EditItem(item)}>
                             <Image
                                 source={{ uri: item.image }}
                                 style={styles.image}
@@ -156,6 +169,9 @@ const Furniture = ({ route }) => {
             setBrandName={setBrandName}
             newItemSize={newItemSize}
             setNewItemSize={setNewItemSize}
+            editItem={editItem}
+            isEdit={isEdit}
+            setIsEdit={setIsEdit}
             />
         </View>)}
         </View>

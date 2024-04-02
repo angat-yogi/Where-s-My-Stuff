@@ -13,7 +13,6 @@ export default function HomeScreen({route}) {
   const [rooms,setRooms]=useState([]);
   const { sharedState, setSharedState } = useSharedState();
   const { user, isLoading } = useUser();
-  console.log("Shared State",sharedState)
 const getRooms = () => {
   try{
   GlobalApi.getDefaultRooms().then(async (resp) => {
@@ -46,6 +45,10 @@ const getRooms = () => {
   // Function to handle refresh action
   const onRefresh = () => {
     setRefreshing(true);
+    getRooms();
+    getCategories();
+    getTrendingFashions();
+    getStorageTypes();
     setRefreshing(false);
   };
 
@@ -91,14 +94,17 @@ const getRooms = () => {
           data={rooms}
           styleImage={styles.imageFashion}
         />
-         <Slider
+        {sharedState.pendingItems.length>0?
+        (<Slider
           isViewAll={false}
           displayHeading={true}
           heading="Pending Items"
           data={sharedState.pendingItems}
-          styleImage={styles.imageFashion}
-        />
-                <Slider
+          styleImage={styles.imagePendingItems}
+        />):(<></>)
+                }
+         
+          <Slider
           isViewAll={false}
           displayHeading={true}
           heading="Trending Fashions"
@@ -118,6 +124,12 @@ const styles = StyleSheet.create({
     objectFit: "fill",
   },
   imageFashion: {
+    width: 220,
+    height: 180,
+    borderRadius: 20,
+    objectFit: "fill",
+  },
+  imagePendingItems: {
     width: 220,
     height: 180,
     borderRadius: 20,

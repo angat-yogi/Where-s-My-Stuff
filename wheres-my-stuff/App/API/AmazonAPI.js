@@ -12,7 +12,6 @@ const fetchAmazonData = async (keyword) => {
     });
 
     const data = await response.json();
-    console.log(data); // This will log the API response to the console
     return data;
   } catch (error) {
     console.error('Error fetching Amazon data:', error);
