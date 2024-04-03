@@ -155,7 +155,7 @@ const panResponder = middleSectionImages.map((_, index) => {
 
   return (
     <View style={styles.container}>
-    <Header icon="camera" action="Camera" />
+    <Header />
     <View style={styles.topSection}>
       <View style={styles.leftSection}>
       <View style={styles.textSection}>

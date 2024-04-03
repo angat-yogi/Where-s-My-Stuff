@@ -77,7 +77,7 @@ const getRooms = () => {
     refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}contentContainerStyle={styles.scrollViewContent}
     showsVerticalScrollIndicator={false}
     >
-      <Header icon="camera" action="Camera" />
+      <Header icon="camera" action="Camera" shouldDisplayProfile={true}/>
       <View style={{ padding: 7 }}>
         <Slider
           isViewAll={true}

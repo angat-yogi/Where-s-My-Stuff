@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { 
   View, 
   Text, 
@@ -10,14 +10,15 @@ import {
   ActivityIndicator, 
   Alert 
 } from "react-native";
+import { Ionicons } from '@expo/vector-icons';
+import { AntDesign } from '@expo/vector-icons';
 import { useUser } from "@clerk/clerk-expo";
 import Colors from "../../Utils/Colors";
 import { MaterialCommunityIcons, FontAwesome } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import Logo from "../../Shared/Logo";
 import Search from "../Search/Search";
-
-export default function Header({ shouldDisplayProfile, icon, displayName }) {
+export default function Header({ shouldDisplayProfile, icon, displayName, shouldDisplayBack }) {
   const { user } = useUser();
   const navigation = useNavigation();
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -26,7 +27,17 @@ export default function Header({ shouldDisplayProfile, icon, displayName }) {
   const [isSearchLoading, setIsSearchLoading] = useState(false);
   const [isSearchModalVisible, setIsSearchModalVisible] = useState(false);
   const [itemsToAddInHouse,setItemsToAddInHouse]=useState([]);
+  const searchInputRef = useRef(null);
 
+useEffect(() => {
+  if (shouldDisplayBack) {
+    searchInputRef.current.focus();
+  }
+}, [shouldDisplayBack]);
+
+  const handleSearchItemInHouse = ()=>{
+    navigation.navigate("Search")
+  }
   const handleProfilePress = () => {
     navigation.openDrawer();
   };
@@ -64,42 +75,62 @@ export default function Header({ shouldDisplayProfile, icon, displayName }) {
     setIsModalVisible(false);
     setIsSearchModalVisible(true);
   };
+  const handleTrendingSearches = () => {
+    // Navigate to trending searches page
+    navigation.navigate("home");
+  };
 
   return (
     user && (
       <>
         <View style={styles.container}>
           <View style={styles.addContainer}>
-            <View style={styles.profileContainer}>
-              <TouchableOpacity onPress={handleProfilePress}>
-                <Image source={{ uri: user?.imageUrl }} style={styles.userImage} />
-              </TouchableOpacity>
-              {displayName && (
-                <View>
-                  <Text style={{ fontSize: 13, color: "purple", fontFamily: "outfit" }}>
-                    Hello,{" "}
-                  </Text>
-                  <Text style={{ fontSize: 15, color: Colors.BLACK, fontFamily: "outfit-bold" }}>
-                    {user?.firstName}!
-                  </Text>
-                </View>
-              )}
-              <View style={styles.logo}>
-                <Logo />
-              </View>
-            </View>
-            <TouchableOpacity onPress={handlePress}>
-              <FontAwesome name={icon} size={24} color="black" />
+           
+          {shouldDisplayProfile?
+          (<View style={styles.profileContainer}>
+            <TouchableOpacity onPress={handleProfilePress}>
+              <Image source={{ uri: user?.imageUrl }} style={styles.userImage} />
             </TouchableOpacity>
+            {displayName && (
+              <View>
+                <Text style={{ fontSize: 13, color: "purple", fontFamily: "outfit" }}>
+                  Hello,{" "}
+                </Text>
+                <Text style={{ fontSize: 15, color: Colors.BLACK, fontFamily: "outfit-bold" }}>
+                  {user?.firstName}!
+                </Text>
+              </View>
+            )}
+            <View style={styles.logo}>
+              <Logo />
+            </View>
+          </View>):(<></>)
+          }
+          {icon?(<TouchableOpacity onPress={handlePress}>
+              <FontAwesome name={icon} size={24} color="black" />
+            </TouchableOpacity>):(<></>)}
           </View>
-          <View style={styles.searchContainer}>
+          <View  style={[styles.searchContainer]}>
+          {shouldDisplayBack?
+             (
+             <View style={{marginRight:10}}>
+             <TouchableOpacity onPress={handleTrendingSearches}> 
+             <Ionicons name="arrow-back-circle-sharp" size={35} color={Colors.BEIGE} />
+         </TouchableOpacity>
+         </View>
+         ):(<></>)
+            }
             <TextInput
+              ref={searchInputRef}
               placeholder="Search"
               style={styles.textInput}
               onChangeText={(text) => setSearchQuery(text)}
               value={searchQuery}
+              onFocus={handleSearchItemInHouse}
+              onSubmitEditing={handleSearch} 
             />
-            <TouchableOpacity onPress={handleSearch} style={styles.searchButton}>
+            {/* { 
+            !shouldDisplayBack?(<TouchableOpacity onPress={handleSearch} style={styles.searchButton}>
               {isSearchLoading ? (
                 <ActivityIndicator size="small" color={Colors.WHITE} />
               ) : (
@@ -109,7 +140,9 @@ export default function Header({ shouldDisplayProfile, icon, displayName }) {
                   color={Colors.WHITE}
                 />
               )}
-            </TouchableOpacity>
+            </TouchableOpacity>):(<></>)
+            } */}
+            
           </View>
           <Modal visible={isModalVisible} animationType="slide" onRequestClose={closeModal}>
             <View style={styles.modalContainer}>
@@ -152,7 +185,7 @@ const styles = StyleSheet.create({
   },
   container: {
     padding: 20,
-    paddingTop: 20,
+    paddingTop: 40,
     backgroundColor: Colors.PRIMARY,
     borderBottomLeftRadius: 5,
     borderBottomRightRadius: 25,
@@ -180,7 +213,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     backgroundColor: Colors.WHITE,
     borderRadius: 10,
-    width: "85%",
+     width:  "85%",
     fontSize: 16,
     fontFamily: "outfit",
   },
@@ -189,6 +222,8 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
+    justifyContent: "center", // Center the content vertically
+
   },
   searchButton: {
     backgroundColor: Colors.BEIGE,

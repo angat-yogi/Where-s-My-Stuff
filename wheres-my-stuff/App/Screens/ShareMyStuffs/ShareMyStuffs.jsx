@@ -3,6 +3,7 @@ import { View, Text, FlatList, Image, TextInput, Button, TouchableOpacity, Style
 import { Entypo } from '@expo/vector-icons';
 import { AntDesign } from '@expo/vector-icons';
 import { FontAwesome6 } from '@expo/vector-icons';
+import Header from '../HomeScreen/Header';
 
 export default function ShareMyStuffs() {
     const [comments, setComments] = useState([]);
@@ -93,7 +94,9 @@ export default function ShareMyStuffs() {
     };
 
     return (
-        <View style={styles.container}>
+        <>
+              <Header icon="camera" action="Camera" shouldDisplayProfile={true}/>
+              <View style={styles.container}>
         <FlatList
             showsVerticalScrollIndicator={false}
             data={images}
@@ -133,6 +136,8 @@ export default function ShareMyStuffs() {
             )}
         />
     </View>
+</>
+       
     );
 };
 

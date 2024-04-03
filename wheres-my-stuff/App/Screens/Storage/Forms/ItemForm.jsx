@@ -158,10 +158,20 @@ const ItemForm = ({ isNewItemAdditionLoading,furnitureType, image, isAddingNewIt
         });
       };
 
+      const close =() => {
+        setIsAddingNewItem(false) 
+        setIsEdit(false)
+        setNewItemName('');
+        setBrandName('');
+        setNewItemSize('');
+        setImage({ uri: '', id: '' });
+    }
+
     const addButtonStyle = isFormComplete && isImageLoading===false ? styles.addButton : [styles.addButton, styles.disabledButton];
     const disabledButtonStyle = {
         backgroundColor: '#ccc', // Grey background color
     };
+    
 
     return (
         <View>
@@ -233,9 +243,7 @@ const ItemForm = ({ isNewItemAdditionLoading,furnitureType, image, isAddingNewIt
                             )}
                             </TouchableOpacity>
 
-                        <TouchableOpacity style={styles.closeButton} onPress={() => {
-                            setIsAddingNewItem(false) 
-                            setIsEdit(false)}}>
+                        <TouchableOpacity style={styles.closeButton} onPress={close}>
                             <Text style={styles.closeButtonText}>Close</Text>
                         </TouchableOpacity>
                     </KeyboardAvoidingView>
