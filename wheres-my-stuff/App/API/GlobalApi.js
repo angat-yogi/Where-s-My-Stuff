@@ -452,6 +452,27 @@ const getRoomFurnitureItems = async (data) => {
 
 
 
+const GetAllUserFurnitureItems = async (data) => {
+  let result;
+  const query = gql`
+  query GetAllFurnitureItems {
+    furnitureItems(where: {userEmail: "${data.email}"},, last: 50) {
+      id
+      furniture
+      name
+      image
+      room
+    }
+  } 
+  `;
+  try {
+    result = await graphQLClient.request(query);
+  } catch (error) {
+    console.error("error on api:", error);
+  }
+  return result;
+};
+
 const getUserFurnitures = async () => {
   let result;
   const query = gql`
@@ -607,5 +628,6 @@ export default {
   getUserFurnitures,
   addFurniture,
   addItemToFurniture,
-  getRoomFurnitureItems
+  getRoomFurnitureItems,
+  GetAllUserFurnitureItems
 };

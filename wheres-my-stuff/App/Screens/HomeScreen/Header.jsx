@@ -10,7 +10,6 @@ import {
   ActivityIndicator, 
   Alert 
 } from "react-native";
-import { Ionicons } from '@expo/vector-icons';
 import { AntDesign } from '@expo/vector-icons';
 import { useUser } from "@clerk/clerk-expo";
 import Colors from "../../Utils/Colors";
@@ -36,7 +35,8 @@ useEffect(() => {
 }, [shouldDisplayBack]);
 
   const handleSearchItemInHouse = ()=>{
-    navigation.navigate("Search")
+    navigation.navigate("Search",{ ref:searchInputRef })
+    
   }
   const handleProfilePress = () => {
     navigation.openDrawer();
@@ -75,10 +75,7 @@ useEffect(() => {
     setIsModalVisible(false);
     setIsSearchModalVisible(true);
   };
-  const handleTrendingSearches = () => {
-    // Navigate to trending searches page
-    navigation.navigate("home");
-  };
+
 
   return (
     user && (
@@ -111,7 +108,7 @@ useEffect(() => {
             </TouchableOpacity>):(<></>)}
           </View>
           <View  style={[styles.searchContainer]}>
-          {shouldDisplayBack?
+          {/* {shouldDisplayBack?
              (
              <View style={{marginRight:10}}>
              <TouchableOpacity onPress={handleTrendingSearches}> 
@@ -119,9 +116,8 @@ useEffect(() => {
          </TouchableOpacity>
          </View>
          ):(<></>)
-            }
+            } */}
             <TextInput
-              ref={searchInputRef}
               placeholder="Search"
               style={styles.textInput}
               onChangeText={(text) => setSearchQuery(text)}
@@ -129,19 +125,6 @@ useEffect(() => {
               onFocus={handleSearchItemInHouse}
               onSubmitEditing={handleSearch} 
             />
-            {/* { 
-            !shouldDisplayBack?(<TouchableOpacity onPress={handleSearch} style={styles.searchButton}>
-              {isSearchLoading ? (
-                <ActivityIndicator size="small" color={Colors.WHITE} />
-              ) : (
-                <MaterialCommunityIcons
-                  name="archive-search"
-                  size={24}
-                  color={Colors.WHITE}
-                />
-              )}
-            </TouchableOpacity>):(<></>)
-            } */}
             
           </View>
           <Modal visible={isModalVisible} animationType="slide" onRequestClose={closeModal}>

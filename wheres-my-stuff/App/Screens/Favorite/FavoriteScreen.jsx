@@ -1,8 +1,9 @@
 import React, { useState } from "react";
-import { View, Text, StyleSheet, Dimensions, Modal, Button, TouchableOpacity, Image } from "react-native";
+import { View, Text, StyleSheet, Dimensions, Modal, Button, TouchableOpacity, Image, ScrollView } from "react-native";
 import { Calendar } from "react-native-calendars";
 import Colors from "../../Utils/Colors";
 import PieChart from 'react-native-pie-chart'
+import Header from "../HomeScreen/Header";
 
 export default function FavoriteScreen() {
   const [modalVisible, setModalVisible] = useState(false);
@@ -19,7 +20,9 @@ export default function FavoriteScreen() {
     const sliceColor = ['#fbd203', '#ffb300', '#ff9100', '#ff6c00', '#ff3c00']
 
   return (
-    <View style={styles.container}>
+    <>
+          <Header  shouldDisplayProfile={false}/>
+        <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
       <Calendar
         style={styles.calendar}
         theme={calendarTheme}
@@ -70,7 +73,9 @@ export default function FavoriteScreen() {
           </View>
         </View>
       </Modal>
-    </View>
+    </ScrollView>
+    </>
+
   );
 }
 
@@ -146,6 +151,9 @@ const styles = StyleSheet.create({
     borderRadius: 10, // Adjust borderRadius as needed
   },
   chartContainer: {
+    marginTop:10,
+    marginBottom:50,
+    paddingTop:10,
     flex: 1,
     justifyContent: "center",
     alignItems: "center",

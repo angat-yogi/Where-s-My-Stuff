@@ -20,6 +20,8 @@ const Furniture = ({ route }) => {
     const[newItemSize,setNewItemSize]=useState('')
     const [editItem,setEditItem]=useState(null);
     const [isAddingNewItem,setIsAddingNewItem]=useState(false)
+    const [selectedItemId, setSelectedItemId] = useState(null); // State to store the selected item's ID
+
   const [isEdit,setIsEdit]=useState(false)
     console.log(route)
 
@@ -100,7 +102,7 @@ const Furniture = ({ route }) => {
                     keyExtractor={(item, index) => index.toString()}
                     renderItem={({ item }) => (
                     <View>
-                        <TouchableOpacity style={styles.imageContainer} onPress={()=>EditItem(item)}>
+                    <TouchableOpacity style={[styles.imageContainer, item.id === selectedItemId && styles.selectedItem]} onPress={()=>EditItem(item)}>
                             <Image
                                 source={{ uri: item.image }}
                                 style={styles.image}
@@ -143,7 +145,8 @@ const Furniture = ({ route }) => {
 
     React.useEffect(() => {
         fetchItems();
-    }, []);
+        setSelectedItemId(route.params.selectedItemId);
+    }, [route.params.selectedItemId]);
 
     return (
         <View style={styles.container}>
@@ -258,6 +261,10 @@ const styles = StyleSheet.create({
         fontSize: 16,
         fontWeight: 'bold',
         textAlign: 'center',
+    },
+    selectedItem: {
+        borderWidth: 2, // Example border width
+        borderColor: 'blue', // Example border color
     },
 });
 

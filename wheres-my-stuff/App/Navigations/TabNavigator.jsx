@@ -23,7 +23,7 @@ const TabNavigator = () => {
       tabBarHideOnKeyboard="true"
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: Colors.PRIMARY,
+        tabBarActiveTintColor: Colors.BEIGE,
       }}
     >
       <Tab.Screen

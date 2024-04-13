@@ -8,6 +8,7 @@
     "web": "expo start --web"
   },
   "dependencies": {
+    "@aitfakirali/react-native-marquee": "^0.0.5",
     "@clerk/clerk-expo": "^0.20.5",
     "@expo/config": "^8.1.1",
     "@expo/metro-config": "^0.10.0",

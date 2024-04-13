@@ -112,7 +112,7 @@ const handleMarkAsDone = (id) => {
 
   return (
     <View style={styles.container}>
-      <Header icon="plus" action="addToDo" />
+      <Header icon="plus" action="addToDo" shouldDisplayProfile={true}/>
       <View style={styles.sliderContainer}>
         <Slider />
       </View>

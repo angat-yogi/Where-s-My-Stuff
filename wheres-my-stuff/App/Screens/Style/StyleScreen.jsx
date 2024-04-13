@@ -16,6 +16,11 @@ const StyleScreen = () => {
   ]);
 
   const loadImagesFromFolder = async () => {
+    const mediaLibraryPermission = await MediaLibrary.requestPermissionsAsync();
+    if (mediaLibraryPermission.status !== 'granted') {
+        Alert.alert('Permission required', 'Please allow access to the media library');
+        return;
+    }
     const folderName = 'WMS'; // Name of the folder in the gallery
     let album = await MediaLibrary.getAlbumAsync(folderName);
     const assets = await MediaLibrary.getAssetsAsync({ album: album, sortBy: ['creationTime'], sortOrder: 'desc' });

@@ -31,8 +31,10 @@ const Room = ({ route }) => {
                         }
                     });
                 });
-
+                
                 setUserFurnitures(filteredFurnitures);
+                console.log("furniture,",userFurnitures)
+
             });
         } catch (error) {
             console.error("Error fetching default furnitures:", error);
