@@ -2,8 +2,7 @@ import { useNavigation } from "@react-navigation/native";
 import React, { useEffect, useRef, useState } from "react";
 import { View, Text, StyleSheet, TouchableOpacity, TextInput, Alert, FlatList, Image, ActivityIndicator } from "react-native";
 import Colors from "../../Utils/Colors";
-import { MaterialIcons, FontAwesome } from "@expo/vector-icons";
-import Header from "../HomeScreen/Header";
+import { MaterialIcons } from "@expo/vector-icons";
 import GlobalApi from '../../API/GlobalApi';
 import { Ionicons } from '@expo/vector-icons';
 import { useUser } from "@clerk/clerk-expo";
@@ -21,21 +20,8 @@ const TrendingSearch = ({seachInputRef}) => {
     const [placeholderIndex, setPlaceholderIndex] = useState(0);
     const [searchPressed,setSearchPressed]=useState(false)
     const [items,setItems]=useState([])
-    const [key, onChangeKey]=useState('')
-    const [value, onChangeValue]=useState('')
     const [searchHistory, setSearchHistory] = useState([]);
 
-
-    const save = async (key,value)=>{
-        await SecureStore.setItemAsync(key,value);
-    }
-
-    const getValueFor=async (key)=>{
-        let result=await SecureStore.getItemAsync(key);
-        if(result){
-
-        }
-    }
     useEffect(() => {
         // Focus on the search input when the component mounts
         searchInputRef.current.focus();
@@ -93,7 +79,8 @@ const TrendingSearch = ({seachInputRef}) => {
         try {
             const history = await SecureStore.getItemAsync('searchHistory');
             if (history !== null) {
-                setSearchHistory(JSON.parse(history));
+            const parsedHistory = JSON.parse(history).reverse(); // Reverse the array
+            setSearchHistory(parsedHistory);
             }
         } catch (error) {
             console.error('Error loading search history:', error);
@@ -108,13 +95,12 @@ const TrendingSearch = ({seachInputRef}) => {
     };
     
     const handleSearch = async () => {
-        fetchItems();
         if(searchQuery === null || searchQuery === ''){
           Alert.alert("Empty Search","Search name can not be empty");
           return;
         }
         else{
-
+            fetchItems();
             // Split the search query into individual words
             const searchWords = searchQuery.toLowerCase().split(' ');
     
@@ -131,11 +117,13 @@ const TrendingSearch = ({seachInputRef}) => {
             setFilteredItems(filtered.slice(0, 10)); // Limit to 10 items
             setSearchPressed(true);
             updateSearchHistory(searchQuery);
+            loadSearchHistory();
 
         }
     };
 
     const handleHistoryItemClick = (query) => {
+        setFilteredItems([]);
         setSearchQuery(query);
         setSearchPressed(true);
     };
@@ -239,21 +227,23 @@ const TrendingSearch = ({seachInputRef}) => {
                 data={filteredItems}
                 renderItem={renderItem}
                 keyExtractor={(item) => item.id}
-                contentContainerStyle={styles.list}
+                contentContainerStyle={[styles.list, { paddingBottom: 120 }]} // Add paddingBottom style
+                showsVerticalScrollIndicator={false}
             />
         )}
     </View>
-{searchHistory.length>0 && filteredItems.length ===0&&  
-(<View style={styles.historyContainer}>
+        {searchHistory.length>0 && filteredItems.length ===0&&  
+        (<View style={styles.historyContainer}>
                 <Text style={styles.historyTitle}>Recent Searches</Text>
                 <FlatList
                     data={searchHistory}
                     renderItem={renderItemHistory}
                     keyExtractor={(item, index) => index.toString()}
                     contentContainerStyle={styles.historyList}
+                    showsVerticalScrollIndicator={false}
                 />
-    </View>)
-}
+            </View>)
+        }
 
     </>
     

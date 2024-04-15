@@ -1,21 +1,14 @@
 import React from "react";
-import { View, Text } from "react-native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import HomeScreen from "../Screens/HomeScreen/HomeScreen";
-import ProfileScreen from "../Screens/ProfileScreen/ProfileScreen";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { SimpleLineIcons } from "@expo/vector-icons";
-import ToDoScreen from "../Screens/ToDoScreen/ToDoScreen";
 import { AntDesign } from "@expo/vector-icons";
 import Colors from "../Utils/Colors";
 import { MaterialIcons } from "@expo/vector-icons";
 import FavoriteScreen from "../Screens/Favorite/FavoriteScreen";
 import HomeNavigator from "./HomeNavigator";
 import ToDoScreenNavigator from "./ToDoScreenNavigator";
-import StyleScreen from "../Screens/Style/StyleScreen";
 import { FontAwesome6 } from '@expo/vector-icons';
 import ShareMyStuffs from "../Screens/ShareMyStuffs/ShareMyStuffs";
-import RecommendedStyleScreen from "../Screens/Style/RecommendedStyleScreen";
 import StyleNavigator from "./StyleNavigator";
 const Tab = createBottomTabNavigator();
 
