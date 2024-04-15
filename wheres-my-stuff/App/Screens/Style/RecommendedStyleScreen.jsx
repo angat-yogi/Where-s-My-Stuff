@@ -4,6 +4,7 @@ import Colors from '../../Utils/Colors';
 import { FontAwesome } from "@expo/vector-icons";
 import { useNavigation } from '@react-navigation/native';
 import { Swipeable } from 'react-native-gesture-handler';
+import Style from './Style';
 
 const RecommendedStyleScreen = () => {
     const navigation = useNavigation();
@@ -47,8 +48,7 @@ const RecommendedStyleScreen = () => {
                 )}
             >
                 <View style={styles.swipeableItem}>
-                    <Image source={{ uri: imageUrl }} style={styles.image}/>
-                    <Text>This is recommended by Gemini</Text>
+                    <Style imageTop={imageUrl} imageBottom={'https://media.graphassets.com/yCUHTePFQW6cMwZWPyRn'} imageAccessories={'https://media.graphassets.com/yCUHTePFQW6cMwZWPyRn'}/>
                 </View>
             </Swipeable>
         );
@@ -76,7 +76,7 @@ const RecommendedStyleScreen = () => {
                 </View>
             </View>
             {/* Example of using swipe gestures */}
-            {renderSwipeableItem("https://media.graphassets.com/tVxJfcPZSGyRp2aQixR7", handleLike, handleDislike)}
+            {renderSwipeableItem("https://media.graphassets.com/zCaVO5G4S76V5bxZICAd", handleLike, handleDislike)}
         </View>
     );
 }
@@ -114,7 +114,8 @@ const styles = StyleSheet.create({
     },
     swipeableItem: {
         height:'100%',
-        width:'100%'
+        width:'100%',
+        alignContent:'center'
     },
     swipeAction: {
         flex: 1,
