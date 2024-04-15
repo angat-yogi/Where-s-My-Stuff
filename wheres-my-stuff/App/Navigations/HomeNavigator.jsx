@@ -10,6 +10,7 @@ import Room from "../Screens/HomeScreen/Room/Room";
 import Furniture from "../Screens/Storage/Furniture";
 import ShareMyStuffs from "../Screens/ShareMyStuffs/ShareMyStuffs";
 import TrendingSearch from "../Screens/Search/TrendingSearch";
+import RecommendedStyleScreen from "../Screens/Style/RecommendedStyleScreen";
 
 const Stack = createStackNavigator();
 export default function HomeNavigator() {
@@ -24,6 +25,7 @@ export default function HomeNavigator() {
       <Stack.Screen name="furniture" component={Furniture} />
       <Stack.Screen name="Share" component={ShareMyStuffs} />
       <Stack.Screen name="Search" component={TrendingSearch} />
+      <Stack.Screen name="RecommendStyle" component={RecommendedStyleScreen} />
     </Stack.Navigator>
   );
 }

@@ -1,10 +1,13 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { PanResponder, View, FlatList, Image, LayoutAnimation, TouchableOpacity, StyleSheet, Alert, ImageBackground,Animated, Text, Button } from 'react-native';
+import { PanResponder, View, FlatList, Image, LayoutAnimation, TouchableOpacity, StyleSheet, Alert, ImageBackground,Animated, Text, Button, TextInput } from 'react-native';
 import Colors from '../../Utils/Colors';
-import Header from '../HomeScreen/Header';
 import * as MediaLibrary from 'expo-media-library';
+import { Ionicons } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
 
 const StyleScreen = () => {
+  const navigation = useNavigation();
+
   // should load from api later
   const [topWearData, setTopWearData] = useState([
 ]);
@@ -14,7 +17,23 @@ const StyleScreen = () => {
 
   const [accessoriesData, setAccessoriesData] = useState([
   ]);
+  const [searchQuery, setSearchQuery] = useState("");
+  const searchInputRef = useRef(null);
 
+  const handleSearchItemInHouse = ()=>{
+      navigation.navigate("Search",{ ref:searchInputRef })
+      
+    }
+    const handlePress = () => {
+      setTimeout(() => {
+      navigation.navigate("RecommendStyle")},300);
+    };
+    const handleSearch = async () => {
+      if(searchQuery === null || searchQuery === ''){
+        Alert.alert("Empty String","Item name can not be empty");
+        return;
+      }
+    };
   const loadImagesFromFolder = async () => {
     const mediaLibraryPermission = await MediaLibrary.requestPermissionsAsync();
     if (mediaLibraryPermission.status !== 'granted') {
@@ -160,7 +179,23 @@ const panResponder = middleSectionImages.map((_, index) => {
 
   return (
     <View style={styles.container}>
-    <Header />
+    <View style={styles.headerContainer}>
+    <View  style={[styles.searchContainer]}>
+    <View style={{paddingRight:20}}>
+            <TouchableOpacity onPress={handlePress}>
+            <Ionicons name="arrow-back-circle-sharp" size={35} color={Colors.BEIGE} />
+            </TouchableOpacity>
+            </View>
+            <TextInput
+              placeholder="Search"
+              style={styles.textInput}
+              onChangeText={(text) => setSearchQuery(text)}
+              value={searchQuery}
+              onFocus={handleSearchItemInHouse}
+              onSubmitEditing={handleSearch} 
+            />
+          </View>
+    </View>
     <View style={styles.topSection}>
       <View style={styles.leftSection}>
       <View style={styles.textSection}>
@@ -240,6 +275,32 @@ const panResponder = middleSectionImages.map((_, index) => {
 const styles = StyleSheet.create({
 container: {
   flex: 1,
+},
+headerContainer: {
+  padding: 20,
+  paddingTop: 40,
+  backgroundColor: Colors.PRIMARY,
+  borderBottomLeftRadius: 5,
+  borderBottomRightRadius: 25,
+  borderTopLeftRadius: 25,
+  borderTopRightRadius: 5,
+},
+textInput: {
+  padding: 10,
+  paddingHorizontal: 20,
+  backgroundColor: Colors.WHITE,
+  borderRadius: 10,
+   width:  "85%",
+  fontSize: 16,
+  fontFamily: "outfit",
+},
+searchContainer: {
+  marginTop: 15,
+  flexDirection: "row",
+  justifyContent: "space-between",
+  alignItems: "center",
+  justifyContent: "center", // Center the content vertically
+
 },
 topSection: {
   flex: 1,

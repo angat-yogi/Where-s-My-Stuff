@@ -19,7 +19,9 @@
       "infoPlist": {
         "NSCameraUsageDescription": "$(PRODUCT_NAME) needs access to your Camera.",
         "NSMicrophoneUsageDescription": "$(PRODUCT_NAME) needs access to your Microphone.",
-        "NSAppTransportSecurity":{"NSAllowsArbitraryLoads":true}
+        "NSAppTransportSecurity": {
+          "NSAllowsArbitraryLoads": true
+        }
       },
       "bundleIdentifier": "com.anonymous.wheresmystuff"
     },
@@ -53,8 +55,8 @@
           "savePhotosPermission": "Allow $(PRODUCT_NAME) to save photos.",
           "isAccessMediaLocationEnabled": "true"
         }
-      ]
+      ],
+      "expo-secure-store"
     ]
-    
   }
 }

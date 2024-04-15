@@ -67,7 +67,7 @@ if (loading) {
     <Drawer.Navigator
       drawerContent={(props) => <ProfileScreen {...props} />}
       screenOptions={{ headerShown: false }}
-    >
+      >
       {firstLogin ? (
          <>
          <Drawer.Screen

@@ -15,6 +15,8 @@ import ToDoScreenNavigator from "./ToDoScreenNavigator";
 import StyleScreen from "../Screens/Style/StyleScreen";
 import { FontAwesome6 } from '@expo/vector-icons';
 import ShareMyStuffs from "../Screens/ShareMyStuffs/ShareMyStuffs";
+import RecommendedStyleScreen from "../Screens/Style/RecommendedStyleScreen";
+import StyleNavigator from "./StyleNavigator";
 const Tab = createBottomTabNavigator();
 
 const TabNavigator = () => {
@@ -59,7 +61,7 @@ const TabNavigator = () => {
       />
       <Tab.Screen
         name="Style"
-        component={StyleScreen}
+        component={StyleNavigator}
         options={{
           tabBarIcon: ({ color, size }) => (
             <MaterialCommunityIcons name="wardrobe-outline" size={size} color={color} />

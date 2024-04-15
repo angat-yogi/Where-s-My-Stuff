@@ -2,13 +2,13 @@ import { useNavigation } from "@react-navigation/native";
 import React, { useEffect, useRef, useState } from "react";
 import { View, Text, StyleSheet, TouchableOpacity, TextInput, Alert, FlatList, Image, ActivityIndicator } from "react-native";
 import Colors from "../../Utils/Colors";
-import { MaterialCommunityIcons, FontAwesome } from "@expo/vector-icons";
+import { MaterialIcons, FontAwesome } from "@expo/vector-icons";
 import Header from "../HomeScreen/Header";
 import GlobalApi from '../../API/GlobalApi';
 import { Ionicons } from '@expo/vector-icons';
 import { useUser } from "@clerk/clerk-expo";
 import MarqueeView from '@aitfakirali/react-native-marquee';
-
+import * as SecureStore from 'expo-secure-store'
 const TrendingSearch = ({seachInputRef}) => {
     const navigation = useNavigation();
     const { user, isLoading } = useUser();
@@ -21,11 +21,26 @@ const TrendingSearch = ({seachInputRef}) => {
     const [placeholderIndex, setPlaceholderIndex] = useState(0);
     const [searchPressed,setSearchPressed]=useState(false)
     const [items,setItems]=useState([])
+    const [key, onChangeKey]=useState('')
+    const [value, onChangeValue]=useState('')
+    const [searchHistory, setSearchHistory] = useState([]);
+
+
+    const save = async (key,value)=>{
+        await SecureStore.setItemAsync(key,value);
+    }
+
+    const getValueFor=async (key)=>{
+        let result=await SecureStore.getItemAsync(key);
+        if(result){
+
+        }
+    }
     useEffect(() => {
         // Focus on the search input when the component mounts
         searchInputRef.current.focus();
         fetchItems();
-
+        loadSearchHistory();
 
         // Change the placeholder text every 3 seconds
         const interval = setInterval(() => {
@@ -47,18 +62,51 @@ const TrendingSearch = ({seachInputRef}) => {
             setItems(response.furnitureItems);
             setIsItemSearchLoading(false); // Stop loading
 
-            console.log("items that can be searched", items)
         } catch (error) {
             setIsItemSearchLoading(false); // Stop loading on error
             console.error('Error fetching items:', error);
         }
     };
 
+    const updateSearchHistory = async (query) => {
+        try {
+            let history = [...searchHistory];
+            // Check if the query already exists in the history
+            const index = history.findIndex((item) => item.toLowerCase() === query.toLowerCase());
+            if (index === -1) {
+                // If not found, add the query to the history
+                history = [...history, query];
+            } else {
+                // If found, move the existing query to the end of the history array
+                const existingQuery = history.splice(index, 1);
+                history.push(existingQuery[0]);
+            }
+            // Save the updated history
+            await SecureStore.setItemAsync('searchHistory', JSON.stringify(history));
+            setSearchHistory(history);
+        } catch (error) {
+            console.error('Error updating search history:', error);
+        }
+    };
+
+    const loadSearchHistory = async () => {
+        try {
+            const history = await SecureStore.getItemAsync('searchHistory');
+            if (history !== null) {
+                setSearchHistory(JSON.parse(history));
+            }
+        } catch (error) {
+            console.error('Error loading search history:', error);
+        }
+    };
 
     const handleTrendingSearches = () => {
-        // Navigate to trending searches page
-        navigation.navigate("home");
-      };
+        // Navigate to trending searches page with initialParams
+        setTimeout(() => {
+        navigation.navigate("home", { initialParams: { refresh: true } });
+        },300);
+    };
+    
     const handleSearch = async () => {
         fetchItems();
         if(searchQuery === null || searchQuery === ''){
@@ -66,6 +114,7 @@ const TrendingSearch = ({seachInputRef}) => {
           return;
         }
         else{
+
             // Split the search query into individual words
             const searchWords = searchQuery.toLowerCase().split(' ');
     
@@ -79,11 +128,37 @@ const TrendingSearch = ({seachInputRef}) => {
                 );
             });
     
-            console.log("filtered",filtered)
             setFilteredItems(filtered.slice(0, 10)); // Limit to 10 items
             setSearchPressed(true);
+            updateSearchHistory(searchQuery);
+
         }
     };
+
+    const handleHistoryItemClick = (query) => {
+        setSearchQuery(query);
+        setSearchPressed(true);
+    };
+    useEffect(() => {
+        if (searchQuery !== '' && searchPressed) {
+            handleSearch();
+        }
+    }, [searchQuery]);
+    const renderItemHistory = ({ item, index }) => (
+        <View style={styles.historyItemContainer}>
+            <View style={styles.historyItemContainer}>
+            <MaterialIcons name="history" size={24} color="black" />
+            <TouchableOpacity onPress={() => handleHistoryItemClick(item)}>
+            <Text style={styles.historyItem}> {item}</Text>
+            </TouchableOpacity>
+            </View>
+            
+            <TouchableOpacity onPress={() => handleRemoveHistoryItem(index)}>
+                <Ionicons name="close-circle" size={20} color={Colors.BEIGE} />
+            </TouchableOpacity>
+        </View>
+    );
+
     
     const renderItem = ({ item }) => (
         <TouchableOpacity onPress={() => handleItemClick(item)}>
@@ -105,7 +180,17 @@ const TrendingSearch = ({seachInputRef}) => {
         
     );
     
-    
+    const handleRemoveHistoryItem = async (index) => {
+        try {
+            const updatedHistory = [...searchHistory];
+            updatedHistory.splice(index, 1);
+            await SecureStore.setItemAsync('searchHistory', JSON.stringify(updatedHistory));
+            setSearchHistory(updatedHistory);
+        } catch (error) {
+            console.error('Error removing history item:', error);
+        }
+    };
+
     const handleItemClick = (item) => {
         if (item) {
             navigation.navigate('furniture', { selectedItem: {email:user.emailAddresses[0].emailAddress,image:item.image,name:item.furniture}, room: item.room, selectedItemId: item.id});
@@ -158,6 +243,18 @@ const TrendingSearch = ({seachInputRef}) => {
             />
         )}
     </View>
+{searchHistory.length>0 && filteredItems.length ===0&&  
+(<View style={styles.historyContainer}>
+                <Text style={styles.historyTitle}>Recent Searches</Text>
+                <FlatList
+                    data={searchHistory}
+                    renderItem={renderItemHistory}
+                    keyExtractor={(item, index) => index.toString()}
+                    contentContainerStyle={styles.historyList}
+                />
+    </View>)
+}
+
     </>
     
   );
@@ -256,6 +353,27 @@ image: {
     marginRight: 10,
     borderWidth:0.5,
     borderRadius:3
+},
+historyContainer: {
+    paddingLeft:10
+},
+historyTitle: {
+    fontSize: 18,
+    marginBottom: 10,
+    textAlign:'center'
+},
+historyList: {
+    paddingHorizontal: 20,
+},
+historyItemContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 8,
+},
+historyItem: {
+    fontSize: 16,
+    color: "black",
 },
 });
 
